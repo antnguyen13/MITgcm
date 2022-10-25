@@ -3,6 +3,8 @@ atn 25.oct.2022
 The code_modX, X=1:7, provided here is to be used along with this FIRST commit to PR 652:
 
 https://github.com/MITgcm/MITgcm/pull/652/commits/bae15e9985d4115320b31cedce7d18a4f28fa205
+plus
+https://github.com/MITgcm/MITgcm/pull/652/commits/c600612ed775b43c3272c8b0664cd10dec0f36f0
 
 In this directory, I provide Tom's original test box -- files in input_binaries, 
 along with with 7 modifications/fixes to Tom's code to fix bugs, improve physics, 
