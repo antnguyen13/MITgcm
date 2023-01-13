@@ -61,9 +61,10 @@
 #ph)
 #globalFiles=.TRUE.,
 #- not safe to use globalFiles in multi-processors runs; set instead useSingleCpuIO
- useSingleCpuIO=.FALSE.,
+ useSingleCpuIO=.true.,
  readBinaryPrec=32,
  writeBinaryPrec=32,
+ debugLevel=4,
  &
 
 # Elliptic solver parameters
@@ -93,17 +94,17 @@
 #
  &PARM03
  tauCD=172800.,
- startTime=0.0,
- nTimeSteps=4,
+ niter0=0,
+ nTimeSteps=9,
  deltaTmom=3600.0,
  deltaTtracer=3600.0,
  deltaTClock =3600.0,
  cAdjFreq=0.,
  abEps=0.1,
  forcing_In_AB = .FALSE.,
- pChkptFreq=36000.,
+ pChkptFreq=3600.,
  chkptFreq= 0.,
- dumpFreq = 0.,
+ dumpFreq = 1.,
  monitorFreq=1.,
  adjMonitorFreq=1.,
  adjDumpFreq=1.,

@@ -46,7 +46,7 @@ C extend to 4-level checkpointing
 c#undef AUTODIFF_4_LEVEL_CHECKPOINT
 
 C o use divided adjoint to split adjoint computations
-#define ALLOW_DIVIDED_ADJOINT
+#undef ALLOW_DIVIDED_ADJOINT
 
 #undef ALLOW_PACKUNPACK_METHOD2
 

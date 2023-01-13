@@ -26,66 +26,15 @@ C   are specific to this package are assumed to be set in ECCO_CPPOPTIONS.h
 C   ==================================================================
 C-- Package-specific Options & Macros go here
 
-C  o  Re-activate deprecated codes in pkg/ecco & pkg/ctrl (but not recommended)
-C     and since pkg/ctrl can be used without pkg/ecco, better to have it here
-#undef ECCO_CTRL_DEPRECATED
-
 #undef EXCLUDE_CTRL_PACK
-#define ALLOW_NONDIMENSIONAL_CONTROL_IO
-#define ALLOW_PACKUNPACK_METHOD2
-
-C       >>> Initial values.
-#define ALLOW_THETA0_CONTROL
-#define ALLOW_SALT0_CONTROL
-#undef ALLOW_UVEL0_CONTROL
-#undef ALLOW_VVEL0_CONTROL
-#undef ALLOW_TR10_CONTROL
-#undef ALLOW_TAUU0_CONTROL
-#undef ALLOW_TAUV0_CONTROL
-#undef ALLOW_SFLUX0_CONTROL
-#undef ALLOW_HFLUX0_CONTROL
-#undef ALLOW_SSS0_CONTROL
-#undef ALLOW_SST0_CONTROL
-
-C       >>> Surface fluxes.
-#undef ALLOW_HFLUX_CONTROL
-#undef ALLOW_SFLUX_CONTROL
-#undef ALLOW_USTRESS_CONTROL
-#undef ALLOW_VSTRESS_CONTROL
-#undef ALLOW_SWFLUX_CONTROL
-#undef ALLOW_LWFLUX_CONTROL
-
-C       >>> Atmospheric state.
-#define  ALLOW_ATEMP_CONTROL
-#define  ALLOW_AQH_CONTROL
-#define  ALLOW_PRECIP_CONTROL
-#define  ALLOW_SNOWPRECIP_CONTROL
-#define  ALLOW_SWDOWN_CONTROL
-#define  ALLOW_LWDOWN_CONTROL
-#define  ALLOW_UWIND_CONTROL
-#define  ALLOW_VWIND_CONTROL
-#undef  ALLOW_EVAP_CONTROL
-#define  ALLOW_APRESSURE_CONTROL
-#undef  ALLOW_RUNOFF_CONTROL
-
-C       >>> Radiation
-#undef  ALLOW_SWFLUX_CONTROL
-#undef  ALLOW_LWFLUX_CONTROL
-
-C       >>> seaice init. conditions
-CML#define  ALLOW_SIAREA_CONTROL
-CML#define  ALLOW_SIHEFF_CONTROL
-#undef  ALLOW_SIHSNOW_CONTROL
+#undef ALLOW_NONDIMENSIONAL_CONTROL_IO
+c#define ALLOW_PACKUNPACK_METHOD2
 
 C       >>> Other Control.
 #undef ALLOW_DIFFKR_CONTROL
 #undef ALLOW_KAPGM_CONTROL
 #undef ALLOW_KAPREDI_CONTROL
 #undef ALLOW_BOTTOMDRAG_CONTROL
-
-C       >>> Backward compatibility option (before checkpoint 65p)
-#undef ALLOW_KAPGM_CONTROL_OLD
-#undef ALLOW_KAPREDI_CONTROL_OLD
 
 C       >>> Generic Control.
 #define ALLOW_GENARR2D_CONTROL
