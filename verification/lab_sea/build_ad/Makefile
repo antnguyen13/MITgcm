@@ -1,9 +1,9 @@
 # Multithreaded + multi-processing makefile for:
 #    Linux nansen 5.15.0-56-generic #62-Ubuntu SMP Tue Nov 22 19:54:14 UTC 2022 x86_64 x86_64 x86_64 GNU/Linux
 # This makefile was generated automatically on
-#    Fri Jan 13 03:07:41 AM CST 2023
+#    Fri Jan 13 06:59:40 PM CST 2023
 # by the command:
-#    ../../../tools/genmake2 -rd=../../../../MITgcm -mods=../code_ad
+#    ../../../tools/genmake2 -devel -rd=../../../../MITgcm -mods=../code_ad
 # executed by:
 #    atnguyen@nansen:/workspace/atnguyen/sv-mnt-nansen/MITgcm_latest/MITgcm/verification/lab_sea/build_ad
 #
@@ -71,16 +71,16 @@ CPPINCLUDES =  -I/usr/lib/gcc/x86_64-linux-gnu/11/include -I/usr/local/include -
 KFLAGS1 = 
 KFLAGS2 = 
 # Optim./debug for FC
-FFLAGS =  -fallow-argument-mismatch -fconvert=big-endian -fimplicit-none -mcmodel=medium
-FOPTIM = -O3 -funroll-loops 
+FFLAGS =  -fallow-argument-mismatch -fconvert=big-endian -fimplicit-none -mcmodel=medium -Wall -Wno-unused-dummy-argument
+FOPTIM = -O0 -g -fbounds-check -ffpe-trap=invalid,zero,overflow -finit-real=inf 
 # Optim./debug for FC
-F90FLAGS =  -fallow-argument-mismatch -fconvert=big-endian -fimplicit-none -mcmodel=medium
-F90OPTIM = -O3 -funroll-loops
+F90FLAGS =  -fallow-argument-mismatch -fconvert=big-endian -fimplicit-none -mcmodel=medium -Wall -Wno-unused-dummy-argument
+F90OPTIM = -O0 -g -fbounds-check -ffpe-trap=invalid,zero,overflow -finit-real=inf
 F90FIXEDFORMAT = -ffixed-form
 # Flags for CC
 CFLAGS = -O0 -mcmodel=medium
 # Files that should not be optimized
-NOOPTFILES =  ini_masks_etc.F
+NOOPTFILES = 
 NOOPTFLAGS = -O0
 # Flags and libraries needed for linking
 LIBS = -L/usr/lib/x86_64-linux-gnu -lnetcdff -Wl,-Bsymbolic-functions -flto=auto -ffat-lto-objects -flto=auto -Wl,-z,relro -Wl,-z,now -lnetcdf -lnetcdf -lm
@@ -2047,7 +2047,7 @@ CLEAN:
 	-rm -f oad_cp.[0-9][0-9][0-9].?????
 
 makefile:
-	../../../tools/genmake2  "-rd=../../../../MITgcm" "-mods=../code_ad"
+	../../../tools/genmake2  "-devel" "-rd=../../../../MITgcm" "-mods=../code_ad"
 cleanlinks:
 	-find . -type l -exec rm {} \;
 
@@ -2066,7 +2066,7 @@ BUILD_INFO.h:
 	@echo Creating $@ ...
 	-echo "#define THISVER 'checkpoint68m'" > $@
 	-echo "#define THISUSER 'atnguyen'" >> $@
-	-echo "#define THISDATE 'Fri Jan 13 03:07:41 AM CST 2023'" >> $@
+	-echo "#define THISDATE 'Fri Jan 13 06:59:40 PM CST 2023'" >> $@
 	-echo "#define THISHOST 'nansen'" >> $@
 
 # The normal chain of rules is (  .F - .f - .o  )
@@ -2655,8 +2655,6 @@ svd_touch:
 	cmp ad_config.template AD_CONFIG.h || cat ad_config.template > AD_CONFIG.h
 	@-rm -f ad_config.template
 
-ini_masks_etc.o: ini_masks_etc.f
-	$(FC) $(FFLAGS) $(NOOPTFLAGS) -c $<
 # This section creates symbolic links
 
 
