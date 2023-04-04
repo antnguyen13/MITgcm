@@ -67,7 +67,7 @@ C     == local variables ==
       integer fldstartdate(4)
       _RL     fldperiod
 
-      integer startrec
+c     integer startrec
 
       integer year0
       integer year1
@@ -129,12 +129,11 @@ C     fldperiod .ne. 0
 C--   Determine the current date.
        call cal_GetDate( myiter, mytime, mydate, mythid )
 
-c     Determine first record:
-       call cal_TimePassed( fldstartdate, modelstartdate,
-     &                      difftime, mythid )
-       call cal_ToSeconds ( difftime, fldsecs, mythid )
-       startrec = int((modelstart + startTime - fldsecs)/
-     &                 fldperiod) + 1
+C     Determine first record:
+c      call cal_TimePassed( fldstartdate, modelstartdate,
+c    &                      difftime, mythid )
+c      call cal_ToSeconds ( difftime, fldsecs, mythid )
+c      startrec = int((modelstart - fldsecs)/fldperiod) + 1
 
 C     Determine the flux record just before mycurrentdate.
        call cal_TimePassed( fldstartdate, mydate, difftime,
@@ -165,11 +164,8 @@ C     Set switches for reading new records.
         endif
        endif
 
-catn: undoing ts PR260
-c      count0 = fldcount
-c      count1 = fldcount + 1
-       count0 = fldcount - startrec + 1
-       count1 = fldcount - startrec + 2
+       count0 = fldcount
+       count1 = fldcount + 1
 
        call cal_TimeInterval( fldsecs, 'secs', difftime, mythid )
        call cal_AddTime( fldstartdate, difftime, flddate, mythid )
@@ -234,10 +230,6 @@ C     Do some printing for the protocol.
         call print_message( msgbuf, standardmessageunit,
      &                      SQUEEZE_RIGHT , mythid)
         write(msgbuf,'(a)') ' '
-        call print_message( msgbuf, standardmessageunit,
-     &                      SQUEEZE_RIGHT , mythid)
-        write(msgbuf,'(a,1x,i10)')
-     &               'CTRL_GET_GEN_REC startrec: ',startrec
         call print_message( msgbuf, standardmessageunit,
      &                      SQUEEZE_RIGHT , mythid)
       _END_MASTER( mythid )
