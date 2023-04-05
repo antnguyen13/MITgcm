@@ -1,7 +1,7 @@
 # Multithreaded + multi-processing makefile for:
 #    Linux nansen 5.15.0-56-generic #62-Ubuntu SMP Tue Nov 22 19:54:14 UTC 2022 x86_64 x86_64 x86_64 GNU/Linux
 # This makefile was generated automatically on
-#    Fri Jan 13 06:59:40 PM CST 2023
+#    Tue Apr  4 03:52:43 PM CDT 2023
 # by the command:
 #    ../../../tools/genmake2 -devel -rd=../../../../MITgcm -mods=../code_ad
 # executed by:
@@ -703,7 +703,6 @@ F77_SRC_FILES =  \
  salt_plume_tendency_apply_t.F \
  salt_plume_volfrac.F \
  advect.F \
- cost_ice_test.F \
  diffus.F \
  dynsolver.F \
  lsr.F \
@@ -723,17 +722,12 @@ F77_SRC_FILES =  \
  seaice_check.F \
  seaice_check_pickup.F \
  seaice_cost_accumulate_mean.F \
- seaice_cost_concentration.F \
- seaice_cost_driver.F \
  seaice_cost_export.F \
  seaice_cost_final.F \
  seaice_cost_init_fixed.F \
  seaice_cost_init_varia.F \
  seaice_cost_sensi.F \
- seaice_cost_sss.F \
- seaice_cost_sst.F \
- seaice_cost_weights.F \
- seaice_ctrl_map_ini.F \
+ seaice_cost_test.F \
  seaice_diagnostics_init.F \
  seaice_diagnostics_state.F \
  seaice_diffusion.F \
@@ -1503,7 +1497,6 @@ NON_AD_F77_SRC_FILES =  \
  seaice_check.F \
  seaice_check_pickup.F \
  seaice_cost_init_fixed.F \
- seaice_cost_weights.F \
  seaice_diagnostics_init.F \
  seaice_diagnostics_state.F \
  seaice_do_ridging.F \
@@ -1810,10 +1803,6 @@ H_SRC_FILES =  \
  DWNSLP_PARAMS.h \
  DWNSLP_SIZE.h \
  DWNSLP_VARS.h \
- ecco_ad_check_lev1_dir.h \
- ecco_ad_check_lev2_dir.h \
- ecco_ad_check_lev3_dir.h \
- ecco_ad_check_lev4_dir.h \
  ecco_cost.h \
  ECCO.h \
  ecco_local_params.h \
@@ -2064,9 +2053,9 @@ FC_NAMEMANGLE.h:
 
 BUILD_INFO.h:
 	@echo Creating $@ ...
-	-echo "#define THISVER 'checkpoint68m'" > $@
+	-echo "#define THISVER 'checkpoint68o'" > $@
 	-echo "#define THISUSER 'atnguyen'" >> $@
-	-echo "#define THISDATE 'Fri Jan 13 06:59:40 PM CST 2023'" >> $@
+	-echo "#define THISDATE 'Tue Apr  4 03:52:43 PM CDT 2023'" >> $@
 	-echo "#define THISHOST 'nansen'" >> $@
 
 # The normal chain of rules is (  .F - .f - .o  )
@@ -2382,16 +2371,11 @@ AD_FILES =  \
  seaice_solve4temp.f \
  seaice_tracer_phys.f \
  seaice_cost_accumulate_mean.f \
- seaice_cost_concentration.f \
- seaice_cost_driver.f \
  seaice_cost_export.f \
  seaice_cost_final.f \
  seaice_cost_init_varia.f \
  seaice_cost_sensi.f \
- seaice_cost_sss.f \
- seaice_cost_sst.f \
- seaice_ctrl_map_ini.f \
- cost_ice_test.f \
+ seaice_cost_test.f \
  seaice_calc_strainrates.f \
  seaice_calc_viscosities.f \
  seaice_dynsolver.f \
@@ -2691,7 +2675,7 @@ svd_touch:
 	if [ ! -L $@ ]; then $(LN) $(ROOTDIR)/pkg/down_slope/$@ $@; fi
 
 #  These files are linked from $(ROOTDIR)/pkg/ecco ( aka ../../../../MITgcm/pkg/ecco )
- cost_averagesfields.F cost_averagesflags.F cost_averagesgeneric.F cost_averagesinit.F cost_bp_read.F cost_gencal.F cost_gencost_all.F cost_gencost_assignperiod.F cost_gencost_boxmean.F cost_gencost_bpv4.F cost_gencost_customize.F cost_gencost_glbmean.F cost_gencost_moc.F cost_gencost_seaicev4.F cost_gencost_sshv4.F cost_gencost_sstv4.F cost_gencost_transp.F cost_generic.F cost_genread.F cost_obcs_ageos.F cost_obcse.F cost_obcs.F cost_obcsn.F cost_obcss.F cost_obcsvol.F cost_obcsw.F cost_sla_read.F cost_sla_read_yd.F ecco_ad_check_lev1_dir.h ecco_ad_check_lev2_dir.h ecco_ad_check_lev3_dir.h ecco_ad_check_lev4_dir.h ecco_check.F ecco_cost_driver.F ecco_cost_final.F ecco_cost.h ecco_cost_init_barfiles.F ecco_cost_init_fixed.F ecco_cost_init_varia.F ecco_cost_weights.F ecco_diagnostics_init.F ECCO.h ecco_init_fixed.F ecco_init_varia.F ecco_local_params.h ecco_phys.F ecco_readparms.F ECCO_SIZE.h ecco_summary.F ecco_toolbox.F stergloh_output.F ecco_ad.flow :
+ cost_averagesfields.F cost_averagesflags.F cost_averagesgeneric.F cost_averagesinit.F cost_bp_read.F cost_gencal.F cost_gencost_all.F cost_gencost_assignperiod.F cost_gencost_boxmean.F cost_gencost_bpv4.F cost_gencost_customize.F cost_gencost_glbmean.F cost_gencost_moc.F cost_gencost_seaicev4.F cost_gencost_sshv4.F cost_gencost_sstv4.F cost_gencost_transp.F cost_generic.F cost_genread.F cost_obcs_ageos.F cost_obcse.F cost_obcs.F cost_obcsn.F cost_obcss.F cost_obcsvol.F cost_obcsw.F cost_sla_read.F cost_sla_read_yd.F ecco_check.F ecco_cost_driver.F ecco_cost_final.F ecco_cost.h ecco_cost_init_barfiles.F ecco_cost_init_fixed.F ecco_cost_init_varia.F ecco_cost_weights.F ecco_diagnostics_init.F ECCO.h ecco_init_fixed.F ecco_init_varia.F ecco_local_params.h ecco_phys.F ecco_readparms.F ECCO_SIZE.h ecco_summary.F ecco_toolbox.F stergloh_output.F ecco_ad.flow :
 	if [ ! -L $@ ]; then $(LN) $(ROOTDIR)/pkg/ecco/$@ $@; fi
 
 #  These files are linked from $(ROOTDIR)/pkg/exf ( aka ../../../../MITgcm/pkg/exf )
@@ -2747,7 +2731,7 @@ svd_touch:
 	if [ ! -L $@ ]; then $(LN) $(ROOTDIR)/pkg/salt_plume/$@ $@; fi
 
 #  These files are linked from $(ROOTDIR)/pkg/seaice ( aka ../../../../MITgcm/pkg/seaice )
- advect.F cost_ice_test.F diffus.F dynsolver.F lsr.F ostres.F seaice_ad_check_lev1_dir.h seaice_ad_check_lev2_dir.h seaice_ad_check_lev3_dir.h seaice_ad_check_lev4_dir.h seaice_ad_dump.F seaice_advdiff.F seaice_advection.F seaice_bottomdrag_coeffs.F seaice_budget_ocean.F seaice_calc_ice_strength.F seaice_calc_lhs.F seaice_calc_residual.F seaice_calc_rhs.F seaice_calc_strainrates.F seaice_calc_stressdiv.F seaice_calc_viscosities.F seaice_check.F seaice_check_pickup.F seaice_cost_accumulate_mean.F seaice_cost_concentration.F seaice_cost_driver.F seaice_cost_export.F seaice_cost_final.F SEAICE_COST.h seaice_cost_init_fixed.F seaice_cost_init_varia.F seaice_cost_sensi.F seaice_cost_sss.F seaice_cost_sst.F seaice_cost_weights.F seaice_ctrl_map_ini.F seaice_diagnostics_init.F seaice_diagnostics_state.F seaice_diffusion.F seaice_do_ridging.F seaice_dynsolver.F seaice_evp.F seaice_fake.F seaice_fgmres.F seaice_freedrift.F seaice_get_dynforcing.F seaice_growth_adx.F seaice_growth.F SEAICE.h seaice_init_fixed.F seaice_init_varia.F seaice_itd_pickup.F seaice_itd_redist.F seaice_itd_remap.F seaice_itd_sum.F seaice_jacvec.F seaice_jfnk.F seaice_krylov.F seaice_lsr.F seaice_map_thsice.F seaice_mnc_init.F seaice_model.F seaice_mom_advection.F seaice_monitor_ad.F seaice_monitor.F seaice_obcs_output.F seaice_oceandrag_coeffs.F seaice_ocean_stress.F seaice_output.F SEAICE_PARAMS.h seaice_preconditioner.F seaice_prepare_ridging.F seaice_readparms.F seaice_read_pickup.F seaice_reg_ridge.F SEAICE_SIZE.h seaice_solve4temp.F seaice_summary.F SEAICE_TAVE.h SEAICE_TRACER.h seaice_tracer_phys.F seaice_turnoff_io.F seaice_write_pickup.F seaice.flow :
+ advect.F diffus.F dynsolver.F lsr.F ostres.F seaice_ad_check_lev1_dir.h seaice_ad_check_lev2_dir.h seaice_ad_check_lev3_dir.h seaice_ad_check_lev4_dir.h seaice_ad_dump.F seaice_advdiff.F seaice_advection.F seaice_bottomdrag_coeffs.F seaice_budget_ocean.F seaice_calc_ice_strength.F seaice_calc_lhs.F seaice_calc_residual.F seaice_calc_rhs.F seaice_calc_strainrates.F seaice_calc_stressdiv.F seaice_calc_viscosities.F seaice_check.F seaice_check_pickup.F seaice_cost_accumulate_mean.F seaice_cost_export.F seaice_cost_final.F SEAICE_COST.h seaice_cost_init_fixed.F seaice_cost_init_varia.F seaice_cost_sensi.F seaice_cost_test.F seaice_diagnostics_init.F seaice_diagnostics_state.F seaice_diffusion.F seaice_do_ridging.F seaice_dynsolver.F seaice_evp.F seaice_fake.F seaice_fgmres.F seaice_freedrift.F seaice_get_dynforcing.F seaice_growth_adx.F seaice_growth.F SEAICE.h seaice_init_fixed.F seaice_init_varia.F seaice_itd_pickup.F seaice_itd_redist.F seaice_itd_remap.F seaice_itd_sum.F seaice_jacvec.F seaice_jfnk.F seaice_krylov.F seaice_lsr.F seaice_map_thsice.F seaice_mnc_init.F seaice_model.F seaice_mom_advection.F seaice_monitor_ad.F seaice_monitor.F seaice_obcs_output.F seaice_oceandrag_coeffs.F seaice_ocean_stress.F seaice_output.F SEAICE_PARAMS.h seaice_preconditioner.F seaice_prepare_ridging.F seaice_readparms.F seaice_read_pickup.F seaice_reg_ridge.F SEAICE_SIZE.h seaice_solve4temp.F seaice_summary.F SEAICE_TAVE.h SEAICE_TRACER.h seaice_tracer_phys.F seaice_turnoff_io.F seaice_write_pickup.F seaice.flow :
 	if [ ! -L $@ ]; then $(LN) $(ROOTDIR)/pkg/seaice/$@ $@; fi
 
 #  These files are linked from $(ROOTDIR)/pkg/cal ( aka ../../../../MITgcm/pkg/cal )
@@ -3629,9 +3613,10 @@ cost_gencost_seaicev4.f: RECIP_DXV_MACROS.h RECIP_DYC_MACROS.h
 cost_gencost_seaicev4.f: RECIP_DYF_MACROS.h RECIP_DYG_MACROS.h
 cost_gencost_seaicev4.f: RECIP_DYU_MACROS.h RECIP_HFACC_MACROS.h
 cost_gencost_seaicev4.f: RECIP_HFACS_MACROS.h RECIP_HFACW_MACROS.h
-cost_gencost_seaicev4.f: SEAICE_COST.h SEAICE_PARAMS.h SEAICE_SIZE.h SIZE.h
-cost_gencost_seaicev4.f: TANPHIATU_MACROS.h TANPHIATV_MACROS.h
-cost_gencost_seaicev4.f: /usr/include/stdc-predef.h XC_MACROS.h YC_MACROS.h
+cost_gencost_seaicev4.f: SEAICE_COST.h SEAICE_OPTIONS.h SEAICE_PARAMS.h
+cost_gencost_seaicev4.f: SEAICE_SIZE.h SIZE.h TANPHIATU_MACROS.h
+cost_gencost_seaicev4.f: TANPHIATV_MACROS.h /usr/include/stdc-predef.h
+cost_gencost_seaicev4.f: XC_MACROS.h YC_MACROS.h
 cost_gencost_sshv4.f: cal.h CPP_EEMACROS.h CPP_EEOPTIONS.h CPP_OPTIONS.h
 cost_gencost_sshv4.f: DXC_MACROS.h DXF_MACROS.h DXG_MACROS.h DXV_MACROS.h
 cost_gencost_sshv4.f: DYC_MACROS.h DYF_MACROS.h DYG_MACROS.h DYU_MACROS.h
@@ -3685,14 +3670,12 @@ cost_generic.f: RA_MACROS.h RAS_MACROS.h RAW_MACROS.h RECIP_DXC_MACROS.h
 cost_generic.f: RECIP_DXF_MACROS.h RECIP_DXG_MACROS.h RECIP_DXV_MACROS.h
 cost_generic.f: RECIP_DYC_MACROS.h RECIP_DYF_MACROS.h RECIP_DYG_MACROS.h
 cost_generic.f: RECIP_DYU_MACROS.h RECIP_HFACC_MACROS.h RECIP_HFACS_MACROS.h
-cost_generic.f: RECIP_HFACW_MACROS.h SEAICE_COST.h SIZE.h TANPHIATU_MACROS.h
+cost_generic.f: RECIP_HFACW_MACROS.h SIZE.h TANPHIATU_MACROS.h
 cost_generic.f: TANPHIATV_MACROS.h /usr/include/stdc-predef.h XC_MACROS.h
 cost_generic.f: YC_MACROS.h
 cost_genread.f: CPP_EEMACROS.h CPP_EEOPTIONS.h CPP_OPTIONS.h ECCO.h
 cost_genread.f: ECCO_OPTIONS.h ECCO_SIZE.h EEPARAMS.h PACKAGES_CONFIG.h SIZE.h
 cost_genread.f: /usr/include/stdc-predef.h
-cost_ice_test.f: CPP_EEMACROS.h CPP_EEOPTIONS.h CPP_OPTIONS.h
-cost_ice_test.f: PACKAGES_CONFIG.h SEAICE_OPTIONS.h /usr/include/stdc-predef.h
 cost_init_varia.f: cost.h COST_OPTIONS.h CPP_EEMACROS.h CPP_EEOPTIONS.h
 cost_init_varia.f: CPP_OPTIONS.h EEPARAMS.h PACKAGES_CONFIG.h SIZE.h
 cost_init_varia.f: /usr/include/stdc-predef.h
@@ -4915,8 +4898,7 @@ ecco_cost_init_barfiles.f: AD_CONFIG.h CPP_EEMACROS.h CPP_EEOPTIONS.h
 ecco_cost_init_barfiles.f: CPP_OPTIONS.h ctrl_dummy.h ctrl.h CTRL_OPTIONS.h
 ecco_cost_init_barfiles.f: CTRL_SIZE.h ECCO.h ECCO_OPTIONS.h ECCO_SIZE.h
 ecco_cost_init_barfiles.f: EEPARAMS.h optim.h PACKAGES_CONFIG.h PARAMS.h
-ecco_cost_init_barfiles.f: SEAICE_COST.h SEAICE_OPTIONS.h SIZE.h
-ecco_cost_init_barfiles.f: /usr/include/stdc-predef.h
+ecco_cost_init_barfiles.f: SIZE.h /usr/include/stdc-predef.h
 ecco_cost_init_fixed.f: AD_CONFIG.h cal.h CPP_EEMACROS.h CPP_EEOPTIONS.h
 ecco_cost_init_fixed.f: CPP_OPTIONS.h CTRL_OPTIONS.h DXC_MACROS.h DXF_MACROS.h
 ecco_cost_init_fixed.f: DXG_MACROS.h DXV_MACROS.h DYC_MACROS.h DYF_MACROS.h
@@ -5662,14 +5644,13 @@ forward_step.f: checkpoint_lev1_directives.h checkpoint_lev1_template.h cost.h
 forward_step.f: COST_OPTIONS.h CPP_EEMACROS.h CPP_EEOPTIONS.h CPP_OPTIONS.h
 forward_step.f: ctrl_ad_check_lev1_dir.h ctrl_dummy.h CTRL_GENARR.h ctrl.h
 forward_step.f: CTRL_OBCS.h CTRL_OPTIONS.h CTRL_SIZE.h DWNSLP_SIZE.h
-forward_step.f: DWNSLP_VARS.h DYNVARS.h ecco_ad_check_lev1_dir.h ecco_cost.h
-forward_step.f: ECCO.h ECCO_OPTIONS.h ECCO_SIZE.h EEPARAMS.h EOS.h
-forward_step.f: exf_ad_check_lev1_dir.h EXF_CONSTANTS.h EXF_FIELDS.h
-forward_step.f: EXF_INTERP_SIZE.h EXF_OPTIONS.h FFIELDS.h
-forward_step.f: gad_ad_check_lev1_dir.h GAD.h GAD_OPTIONS.h GAD_SOM_VARS.h
-forward_step.f: GMREDI.h GMREDI_OPTIONS.h KPP.h PACKAGES_CONFIG.h PARAMS.h
-forward_step.f: salt_plume_ad_check_lev1_dir.h SALT_PLUME.h
-forward_step.f: seaice_ad_check_lev1_dir.h SEAICE_COST.h SEAICE.h
+forward_step.f: DWNSLP_VARS.h DYNVARS.h ecco_cost.h ECCO.h ECCO_OPTIONS.h
+forward_step.f: ECCO_SIZE.h EEPARAMS.h EOS.h exf_ad_check_lev1_dir.h
+forward_step.f: EXF_CONSTANTS.h EXF_FIELDS.h EXF_INTERP_SIZE.h EXF_OPTIONS.h
+forward_step.f: FFIELDS.h gad_ad_check_lev1_dir.h GAD.h GAD_OPTIONS.h
+forward_step.f: GAD_SOM_VARS.h GMREDI.h GMREDI_OPTIONS.h KPP.h
+forward_step.f: PACKAGES_CONFIG.h PARAMS.h salt_plume_ad_check_lev1_dir.h
+forward_step.f: SALT_PLUME.h seaice_ad_check_lev1_dir.h SEAICE_COST.h SEAICE.h
 forward_step.f: SEAICE_OPTIONS.h SEAICE_SIZE.h SIGREG.h SIZE.h SURFACE.h
 forward_step.f: tamc.h /usr/include/stdc-predef.h
 freesurf_rescale_g.f: CPP_EEMACROS.h CPP_EEOPTIONS.h CPP_OPTIONS.h
@@ -7139,8 +7120,8 @@ ini_depths.f: RECIP_HFACS_MACROS.h RECIP_HFACW_MACROS.h SIZE.h SURFACE.h
 ini_depths.f: TANPHIATU_MACROS.h TANPHIATV_MACROS.h /usr/include/stdc-predef.h
 ini_depths.f: XC_MACROS.h YC_MACROS.h
 ini_dynvars.f: CPP_EEMACROS.h CPP_EEOPTIONS.h CPP_OPTIONS.h CTRL_OPTIONS.h
-ini_dynvars.f: DYNVARS.h EEPARAMS.h PACKAGES_CONFIG.h PARAMS.h SIZE.h
-ini_dynvars.f: /usr/include/stdc-predef.h
+ini_dynvars.f: DYNVARS.h EEPARAMS.h MOM_COMMON_OPTIONS.h PACKAGES_CONFIG.h
+ini_dynvars.f: PARAMS.h SIZE.h /usr/include/stdc-predef.h
 ini_eos.f: CPP_EEMACROS.h CPP_EEOPTIONS.h CPP_OPTIONS.h DXC_MACROS.h
 ini_eos.f: DXF_MACROS.h DXG_MACROS.h DXV_MACROS.h DYC_MACROS.h DYF_MACROS.h
 ini_eos.f: DYG_MACROS.h DYU_MACROS.h EEPARAMS.h EOS.h FCORI_MACROS.h GRID.h
@@ -9429,43 +9410,21 @@ seaice_check_pickup.f: /usr/include/stdc-predef.h
 seaice_cost_accumulate_mean.f: cost.h CPP_EEMACROS.h CPP_EEOPTIONS.h
 seaice_cost_accumulate_mean.f: CPP_OPTIONS.h DXC_MACROS.h DXF_MACROS.h
 seaice_cost_accumulate_mean.f: DXG_MACROS.h DXV_MACROS.h DYC_MACROS.h
-seaice_cost_accumulate_mean.f: DYF_MACROS.h DYG_MACROS.h DYNVARS.h
-seaice_cost_accumulate_mean.f: DYU_MACROS.h EEPARAMS.h FCORI_MACROS.h GRID.h
-seaice_cost_accumulate_mean.f: GRID_MACROS.h HFACC_MACROS.h HFACS_MACROS.h
-seaice_cost_accumulate_mean.f: HFACW_MACROS.h MASKS_MACROS.h MASKW_MACROS.h
-seaice_cost_accumulate_mean.f: PACKAGES_CONFIG.h PARAMS.h RA_MACROS.h
-seaice_cost_accumulate_mean.f: RAS_MACROS.h RAW_MACROS.h RECIP_DXC_MACROS.h
-seaice_cost_accumulate_mean.f: RECIP_DXF_MACROS.h RECIP_DXG_MACROS.h
-seaice_cost_accumulate_mean.f: RECIP_DXV_MACROS.h RECIP_DYC_MACROS.h
-seaice_cost_accumulate_mean.f: RECIP_DYF_MACROS.h RECIP_DYG_MACROS.h
-seaice_cost_accumulate_mean.f: RECIP_DYU_MACROS.h RECIP_HFACC_MACROS.h
-seaice_cost_accumulate_mean.f: RECIP_HFACS_MACROS.h RECIP_HFACW_MACROS.h
-seaice_cost_accumulate_mean.f: SEAICE.h SEAICE_OPTIONS.h SEAICE_SIZE.h SIZE.h
+seaice_cost_accumulate_mean.f: DYF_MACROS.h DYG_MACROS.h DYU_MACROS.h
+seaice_cost_accumulate_mean.f: EEPARAMS.h FCORI_MACROS.h GRID.h GRID_MACROS.h
+seaice_cost_accumulate_mean.f: HFACC_MACROS.h HFACS_MACROS.h HFACW_MACROS.h
+seaice_cost_accumulate_mean.f: MASKS_MACROS.h MASKW_MACROS.h PACKAGES_CONFIG.h
+seaice_cost_accumulate_mean.f: PARAMS.h RA_MACROS.h RAS_MACROS.h RAW_MACROS.h
+seaice_cost_accumulate_mean.f: RECIP_DXC_MACROS.h RECIP_DXF_MACROS.h
+seaice_cost_accumulate_mean.f: RECIP_DXG_MACROS.h RECIP_DXV_MACROS.h
+seaice_cost_accumulate_mean.f: RECIP_DYC_MACROS.h RECIP_DYF_MACROS.h
+seaice_cost_accumulate_mean.f: RECIP_DYG_MACROS.h RECIP_DYU_MACROS.h
+seaice_cost_accumulate_mean.f: RECIP_HFACC_MACROS.h RECIP_HFACS_MACROS.h
+seaice_cost_accumulate_mean.f: RECIP_HFACW_MACROS.h SEAICE_COST.h SEAICE.h
+seaice_cost_accumulate_mean.f: SEAICE_OPTIONS.h SEAICE_SIZE.h SIZE.h
 seaice_cost_accumulate_mean.f: TANPHIATU_MACROS.h TANPHIATV_MACROS.h
 seaice_cost_accumulate_mean.f: /usr/include/stdc-predef.h XC_MACROS.h
 seaice_cost_accumulate_mean.f: YC_MACROS.h
-seaice_cost_concentration.f: AUTODIFF_OPTIONS.h cal.h COST_OPTIONS.h
-seaice_cost_concentration.f: CPP_EEMACROS.h CPP_EEOPTIONS.h CPP_OPTIONS.h
-seaice_cost_concentration.f: CTRL_OPTIONS.h ECCO.h ECCO_OPTIONS.h ECCO_SIZE.h
-seaice_cost_concentration.f: EEPARAMS.h optim.h PACKAGES_CONFIG.h PARAMS.h
-seaice_cost_concentration.f: SEAICE_COST.h SEAICE_OPTIONS.h SEAICE_PARAMS.h
-seaice_cost_concentration.f: SEAICE_SIZE.h SIZE.h /usr/include/stdc-predef.h
-seaice_cost_driver.f: AUTODIFF_OPTIONS.h cal.h CPP_EEMACROS.h CPP_EEOPTIONS.h
-seaice_cost_driver.f: CPP_OPTIONS.h ctrl_dummy.h ctrl.h CTRL_OPTIONS.h
-seaice_cost_driver.f: CTRL_SIZE.h DXC_MACROS.h DXF_MACROS.h DXG_MACROS.h
-seaice_cost_driver.f: DXV_MACROS.h DYC_MACROS.h DYF_MACROS.h DYG_MACROS.h
-seaice_cost_driver.f: DYU_MACROS.h ecco_cost.h ECCO.h ECCO_OPTIONS.h
-seaice_cost_driver.f: ECCO_SIZE.h EEPARAMS.h FCORI_MACROS.h GRID.h
-seaice_cost_driver.f: GRID_MACROS.h HFACC_MACROS.h HFACS_MACROS.h
-seaice_cost_driver.f: HFACW_MACROS.h MASKS_MACROS.h MASKW_MACROS.h
-seaice_cost_driver.f: PACKAGES_CONFIG.h PARAMS.h RA_MACROS.h RAS_MACROS.h
-seaice_cost_driver.f: RAW_MACROS.h RECIP_DXC_MACROS.h RECIP_DXF_MACROS.h
-seaice_cost_driver.f: RECIP_DXG_MACROS.h RECIP_DXV_MACROS.h RECIP_DYC_MACROS.h
-seaice_cost_driver.f: RECIP_DYF_MACROS.h RECIP_DYG_MACROS.h RECIP_DYU_MACROS.h
-seaice_cost_driver.f: RECIP_HFACC_MACROS.h RECIP_HFACS_MACROS.h
-seaice_cost_driver.f: RECIP_HFACW_MACROS.h SEAICE_COST.h SEAICE_OPTIONS.h
-seaice_cost_driver.f: SIZE.h TANPHIATU_MACROS.h TANPHIATV_MACROS.h
-seaice_cost_driver.f: /usr/include/stdc-predef.h XC_MACROS.h YC_MACROS.h
 seaice_cost_export.f: CPP_EEMACROS.h CPP_EEOPTIONS.h CPP_OPTIONS.h
 seaice_cost_export.f: DXC_MACROS.h DXF_MACROS.h DXG_MACROS.h DXV_MACROS.h
 seaice_cost_export.f: DYC_MACROS.h DYF_MACROS.h DYG_MACROS.h DYU_MACROS.h
@@ -9485,83 +9444,19 @@ seaice_cost_final.f: CPP_OPTIONS.h ctrl.h CTRL_OPTIONS.h EEPARAMS.h optim.h
 seaice_cost_final.f: PACKAGES_CONFIG.h PARAMS.h SEAICE_COST.h SEAICE_OPTIONS.h
 seaice_cost_final.f: SEAICE_PARAMS.h SEAICE_SIZE.h SIZE.h
 seaice_cost_final.f: /usr/include/stdc-predef.h
-seaice_cost_init_fixed.f: AD_CONFIG.h cal.h CPP_EEMACROS.h CPP_EEOPTIONS.h
-seaice_cost_init_fixed.f: CPP_OPTIONS.h DXC_MACROS.h DXF_MACROS.h DXG_MACROS.h
-seaice_cost_init_fixed.f: DXV_MACROS.h DYC_MACROS.h DYF_MACROS.h DYG_MACROS.h
-seaice_cost_init_fixed.f: DYU_MACROS.h EEPARAMS.h FCORI_MACROS.h GRID.h
-seaice_cost_init_fixed.f: GRID_MACROS.h HFACC_MACROS.h HFACS_MACROS.h
-seaice_cost_init_fixed.f: HFACW_MACROS.h MASKS_MACROS.h MASKW_MACROS.h
-seaice_cost_init_fixed.f: PACKAGES_CONFIG.h PARAMS.h RA_MACROS.h RAS_MACROS.h
-seaice_cost_init_fixed.f: RAW_MACROS.h RECIP_DXC_MACROS.h RECIP_DXF_MACROS.h
-seaice_cost_init_fixed.f: RECIP_DXG_MACROS.h RECIP_DXV_MACROS.h
-seaice_cost_init_fixed.f: RECIP_DYC_MACROS.h RECIP_DYF_MACROS.h
-seaice_cost_init_fixed.f: RECIP_DYG_MACROS.h RECIP_DYU_MACROS.h
-seaice_cost_init_fixed.f: RECIP_HFACC_MACROS.h RECIP_HFACS_MACROS.h
-seaice_cost_init_fixed.f: RECIP_HFACW_MACROS.h SEAICE_COST.h SEAICE_OPTIONS.h
-seaice_cost_init_fixed.f: SIZE.h TANPHIATU_MACROS.h TANPHIATV_MACROS.h
-seaice_cost_init_fixed.f: /usr/include/stdc-predef.h XC_MACROS.h YC_MACROS.h
+seaice_cost_init_fixed.f: cal.h CPP_EEMACROS.h CPP_EEOPTIONS.h CPP_OPTIONS.h
+seaice_cost_init_fixed.f: EEPARAMS.h PACKAGES_CONFIG.h PARAMS.h SEAICE_COST.h
+seaice_cost_init_fixed.f: SEAICE_OPTIONS.h SIZE.h /usr/include/stdc-predef.h
 seaice_cost_init_varia.f: CPP_EEMACROS.h CPP_EEOPTIONS.h CPP_OPTIONS.h
-seaice_cost_init_varia.f: DXC_MACROS.h DXF_MACROS.h DXG_MACROS.h DXV_MACROS.h
-seaice_cost_init_varia.f: DYC_MACROS.h DYF_MACROS.h DYG_MACROS.h DYU_MACROS.h
-seaice_cost_init_varia.f: EEPARAMS.h FCORI_MACROS.h GRID.h GRID_MACROS.h
-seaice_cost_init_varia.f: HFACC_MACROS.h HFACS_MACROS.h HFACW_MACROS.h
-seaice_cost_init_varia.f: MASKS_MACROS.h MASKW_MACROS.h PACKAGES_CONFIG.h
-seaice_cost_init_varia.f: RA_MACROS.h RAS_MACROS.h RAW_MACROS.h
-seaice_cost_init_varia.f: RECIP_DXC_MACROS.h RECIP_DXF_MACROS.h
-seaice_cost_init_varia.f: RECIP_DXG_MACROS.h RECIP_DXV_MACROS.h
-seaice_cost_init_varia.f: RECIP_DYC_MACROS.h RECIP_DYF_MACROS.h
-seaice_cost_init_varia.f: RECIP_DYG_MACROS.h RECIP_DYU_MACROS.h
-seaice_cost_init_varia.f: RECIP_HFACC_MACROS.h RECIP_HFACS_MACROS.h
-seaice_cost_init_varia.f: RECIP_HFACW_MACROS.h SEAICE_COST.h SEAICE.h
+seaice_cost_init_varia.f: EEPARAMS.h PACKAGES_CONFIG.h SEAICE_COST.h
 seaice_cost_init_varia.f: SEAICE_OPTIONS.h SEAICE_SIZE.h SIZE.h
-seaice_cost_init_varia.f: TANPHIATU_MACROS.h TANPHIATV_MACROS.h
-seaice_cost_init_varia.f: /usr/include/stdc-predef.h XC_MACROS.h YC_MACROS.h
+seaice_cost_init_varia.f: /usr/include/stdc-predef.h
 seaice_cost_sensi.f: CPP_EEMACROS.h CPP_EEOPTIONS.h CPP_OPTIONS.h EEPARAMS.h
 seaice_cost_sensi.f: PACKAGES_CONFIG.h PARAMS.h SEAICE_OPTIONS.h SIZE.h
 seaice_cost_sensi.f: /usr/include/stdc-predef.h
-seaice_cost_sss.f: cal.h COST_OPTIONS.h CPP_EEMACROS.h CPP_EEOPTIONS.h
-seaice_cost_sss.f: CPP_OPTIONS.h CTRL_OPTIONS.h ECCO.h ECCO_OPTIONS.h
-seaice_cost_sss.f: ECCO_SIZE.h EEPARAMS.h optim.h PACKAGES_CONFIG.h PARAMS.h
-seaice_cost_sss.f: SEAICE_COST.h SEAICE_OPTIONS.h SEAICE_PARAMS.h
-seaice_cost_sss.f: SEAICE_SIZE.h SIZE.h /usr/include/stdc-predef.h
-seaice_cost_sst.f: cal.h COST_OPTIONS.h CPP_EEMACROS.h CPP_EEOPTIONS.h
-seaice_cost_sst.f: CPP_OPTIONS.h CTRL_OPTIONS.h ECCO.h ECCO_OPTIONS.h
-seaice_cost_sst.f: ECCO_SIZE.h EEPARAMS.h optim.h PACKAGES_CONFIG.h PARAMS.h
-seaice_cost_sst.f: SEAICE_COST.h SEAICE_OPTIONS.h SEAICE_PARAMS.h
-seaice_cost_sst.f: SEAICE_SIZE.h SIZE.h /usr/include/stdc-predef.h
-seaice_cost_weights.f: CPP_EEMACROS.h CPP_EEOPTIONS.h CPP_OPTIONS.h ctrl.h
-seaice_cost_weights.f: CTRL_OPTIONS.h DXC_MACROS.h DXF_MACROS.h DXG_MACROS.h
-seaice_cost_weights.f: DXV_MACROS.h DYC_MACROS.h DYF_MACROS.h DYG_MACROS.h
-seaice_cost_weights.f: DYU_MACROS.h ECCO.h ECCO_OPTIONS.h ECCO_SIZE.h
-seaice_cost_weights.f: EEPARAMS.h FCORI_MACROS.h GRID.h GRID_MACROS.h
-seaice_cost_weights.f: HFACC_MACROS.h HFACS_MACROS.h HFACW_MACROS.h
-seaice_cost_weights.f: MASKS_MACROS.h MASKW_MACROS.h PACKAGES_CONFIG.h
-seaice_cost_weights.f: PARAMS.h RA_MACROS.h RAS_MACROS.h RAW_MACROS.h
-seaice_cost_weights.f: RECIP_DXC_MACROS.h RECIP_DXF_MACROS.h
-seaice_cost_weights.f: RECIP_DXG_MACROS.h RECIP_DXV_MACROS.h
-seaice_cost_weights.f: RECIP_DYC_MACROS.h RECIP_DYF_MACROS.h
-seaice_cost_weights.f: RECIP_DYG_MACROS.h RECIP_DYU_MACROS.h
-seaice_cost_weights.f: RECIP_HFACC_MACROS.h RECIP_HFACS_MACROS.h
-seaice_cost_weights.f: RECIP_HFACW_MACROS.h SEAICE_COST.h SEAICE_OPTIONS.h
-seaice_cost_weights.f: SIZE.h TANPHIATU_MACROS.h TANPHIATV_MACROS.h
-seaice_cost_weights.f: /usr/include/stdc-predef.h XC_MACROS.h YC_MACROS.h
-seaice_ctrl_map_ini.f: CPP_EEMACROS.h CPP_EEOPTIONS.h CPP_OPTIONS.h
-seaice_ctrl_map_ini.f: ctrl_dummy.h ctrl.h CTRL_OPTIONS.h CTRL_SIZE.h
-seaice_ctrl_map_ini.f: DXC_MACROS.h DXF_MACROS.h DXG_MACROS.h DXV_MACROS.h
-seaice_ctrl_map_ini.f: DYC_MACROS.h DYF_MACROS.h DYG_MACROS.h DYNVARS.h
-seaice_ctrl_map_ini.f: DYU_MACROS.h EEPARAMS.h FCORI_MACROS.h FFIELDS.h GRID.h
-seaice_ctrl_map_ini.f: GRID_MACROS.h HFACC_MACROS.h HFACS_MACROS.h
-seaice_ctrl_map_ini.f: HFACW_MACROS.h MASKS_MACROS.h MASKW_MACROS.h optim.h
-seaice_ctrl_map_ini.f: PACKAGES_CONFIG.h PARAMS.h RA_MACROS.h RAS_MACROS.h
-seaice_ctrl_map_ini.f: RAW_MACROS.h RECIP_DXC_MACROS.h RECIP_DXF_MACROS.h
-seaice_ctrl_map_ini.f: RECIP_DXG_MACROS.h RECIP_DXV_MACROS.h
-seaice_ctrl_map_ini.f: RECIP_DYC_MACROS.h RECIP_DYF_MACROS.h
-seaice_ctrl_map_ini.f: RECIP_DYG_MACROS.h RECIP_DYU_MACROS.h
-seaice_ctrl_map_ini.f: RECIP_HFACC_MACROS.h RECIP_HFACS_MACROS.h
-seaice_ctrl_map_ini.f: RECIP_HFACW_MACROS.h SEAICE.h SEAICE_OPTIONS.h
-seaice_ctrl_map_ini.f: SEAICE_SIZE.h SIZE.h TANPHIATU_MACROS.h
-seaice_ctrl_map_ini.f: TANPHIATV_MACROS.h /usr/include/stdc-predef.h
-seaice_ctrl_map_ini.f: XC_MACROS.h YC_MACROS.h
+seaice_cost_test.f: CPP_EEMACROS.h CPP_EEOPTIONS.h CPP_OPTIONS.h
+seaice_cost_test.f: PACKAGES_CONFIG.h SEAICE_OPTIONS.h
+seaice_cost_test.f: /usr/include/stdc-predef.h
 seaice_diagnostics_init.f: CPP_EEMACROS.h CPP_EEOPTIONS.h CPP_OPTIONS.h
 seaice_diagnostics_init.f: EEPARAMS.h PACKAGES_CONFIG.h SEAICE_OPTIONS.h
 seaice_diagnostics_init.f: SEAICE_PARAMS.h SEAICE_SIZE.h SEAICE_TRACER.h
@@ -10131,8 +10026,7 @@ the_main_loop.f: CPP_OPTIONS.h ctrl_ad_check_lev2_dir.h
 the_main_loop.f: ctrl_ad_check_lev3_dir.h ctrl_dummy.h CTRL_GENARR.h ctrl.h
 the_main_loop.f: CTRL_OBCS.h CTRL_OPTIONS.h CTRL_SIZE.h DXC_MACROS.h
 the_main_loop.f: DXF_MACROS.h DXG_MACROS.h DXV_MACROS.h DYC_MACROS.h
-the_main_loop.f: DYF_MACROS.h DYG_MACROS.h DYNVARS.h DYU_MACROS.h
-the_main_loop.f: ecco_ad_check_lev2_dir.h ecco_ad_check_lev3_dir.h ecco_cost.h
+the_main_loop.f: DYF_MACROS.h DYG_MACROS.h DYNVARS.h DYU_MACROS.h ecco_cost.h
 the_main_loop.f: ECCO.h ECCO_OPTIONS.h ECCO_SIZE.h EEPARAMS.h EOS.h
 the_main_loop.f: exf_ad_check_lev2_dir.h exf_ad_check_lev3_dir.h
 the_main_loop.f: EXF_CONSTANTS.h EXF_FIELDS.h EXF_INTERP_SIZE.h EXF_OPTIONS.h
