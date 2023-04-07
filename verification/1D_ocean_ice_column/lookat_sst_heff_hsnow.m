@@ -4,11 +4,12 @@ clear all;
 dirroot='/home/atnguyen/nansen/MITgcm_latest/MITgcm/verification/1D_ocean_ice_column/'
 
 runstr={'run_Ice5mSnow5m_SPoffFloodONSIsal0rhoSnow910albedo',...
-        'run_Ice5mSnow5m_SPoffFloodONSIsal0rhoSnow910albedo_master'};
+        'run_Ice5mSnow5m_SPoffFloodONSIsal0rhoSnow910albedo_master',...
+        'run_Ice5mSnow5m_SPoffFloodONSIsal0rhoSnow910albedo_ADXoff'};
 
 str={'dynstat_theta','seaice_heff','seaice_hsnow'};
 
-for ir=2:2
+for ir=3:3
   dirin=[dirroot runstr{ir} '/'];
   tmp=load([dirin str{1} '_max.txt']);l=length(tmp);
   a=zeros(l,3);for i=1:3;a(:,i)=load([dirin str{i} '_max.txt']);end;

@@ -31,9 +31,14 @@ code_ad
 build_ad
 run_Ice5mSnow5m_SPoffFloodONSIsal0rhoSnow910albedo --> sst_heff_hsnow.png
 
+code,build,run of upstream/master seaice_growth.F (no adx)
+code_ad_ADXoff
+build_ad_ADXoff
+run_Ice5mSnow5m_SPoffFloodONSIsal0rhoSnow910albedo_ADXoff --> sst_heff_hsnow.png
+
 =====================================
 script to run:
-script_run.bash <-- edit to switch between the two runs above
+script_run.bash <-- edit to switch between the three runs above
 
 =====================================
 post-processing:
