@@ -74,6 +74,9 @@
  vectorInvariantMomentum=.TRUE.,
  useRealFreshWaterFlux = .TRUE.,
  useSingleCpuIO = .TRUE.,
+ select_rStar=2,
+ nonlinFreeSurf=4,
+ exactConserv=.TRUE.,
 # debugLevel=1,
  &
 
@@ -104,7 +107,9 @@
 #
  &PARM03
  startTime=0.0,
- nTimeSteps= 10,
+# nTimeSteps= 10,
+## 1yr1mo (365+30days)
+ nTimeSteps=9480,
 # nTimeSteps= 11000,
  deltaTtracer=3600.0,
  deltaTClock =3600.0,
@@ -119,8 +124,8 @@
 # adjDumpFreq=86400.,
 # adjMonitorFreq = 86400.,
  monitorFreq=1.,
- adjDumpFreq=1.,
- adjMonitorFreq = 1.,
+ adjDumpFreq=2628000.,
+ adjMonitorFreq = 86400.,
  &
 
 # Gridding parameters
@@ -147,5 +152,6 @@
  &
 
  &PARM05
- bathyFile = 'bathy_1x1_1105m_testpool',
+# bathyFile = 'bathy_1x1_1105m_testpool',
+ bathyFile       = 'bathy_10_1x1',
  &

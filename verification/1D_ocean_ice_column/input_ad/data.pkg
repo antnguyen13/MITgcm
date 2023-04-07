@@ -4,8 +4,9 @@
   useEXF    = .TRUE.,
   useSEAICE = .TRUE.,
   useECCO   = .TRUE.,
-  useGrdchk = .TRUE.,
+  useGrdchk = .FALSE.,
 
-#  useMNC    = .TRUE,
-#  useDiagnostics = .TRUE.,
+  useMNC         = .FALSE.,
+  useDiagnostics = .FALSE.,
+  useCAL         = .TRUE.,
  &

@@ -90,9 +90,14 @@ C o Allow/exclude "Exact Convervation" of fluid in Free-Surface formulation
 C   that ensures that d/dt(eta) is exactly equal to - Div.Transport
 #define EXACT_CONSERV
 
+C********* RELEVANT CHANGES *********
 C o Allow the use of Non-Linear Free-Surface formulation
 C   this implies that grid-cell thickness (hFactors) varies with time
-#undef NONLIN_FRSURF
+#define NONLIN_FRSURF
+C o NEW OPTION to disable rStar (z*) code
+# undef DISABLE_RSTAR_CODE
+#define DISABLE_SIGMA_CODE
+C********* RELEVANT CHANGES *********
 
 C o Include/exclude nonHydrostatic code
 #undef ALLOW_NONHYDROSTATIC

@@ -1,0 +1,5 @@
+grep dynstat_theta_max STDOUT.0000 |awk '{print $6}' > dynstat_theta_max.txt
+grep dynstat_salt_max  STDOUT.0000 |awk '{print $6}' > dynstat_salt_max.txt
+grep seaice_heff_max   STDOUT.0000 |awk '{print $6}' > seaice_heff_max.txt
+grep seaice_hsnow_max  STDOUT.0000 |awk '{print $6}' > seaice_hsnow_max.txt
+grep forcing_empmr_max STDOUT.0000 |awk '{print $6}' > forcing_empmr_max.txt

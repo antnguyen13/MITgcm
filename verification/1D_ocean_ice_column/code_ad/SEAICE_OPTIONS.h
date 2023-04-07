@@ -14,10 +14,10 @@ C     *==========================================================*
 #ifdef ALLOW_SEAICE
 C     Package-specific Options & Macros go here
 
-C     Moved here from obsolete ECCO_CPPOPTIONS.h
-cph >>>>>> !!!!!! SPECIAL SEAICE FLAG FOR TESTING !!!!!! <<<<<<
-#define  SEAICE_EXCLUDE_FOR_EXACT_AD_TESTING
-cph >>>>>> !!!!!! SPECIAL SEAICE FLAG FOR TESTING !!!!!! <<<<<<
+CC     Moved here from obsolete ECCO_CPPOPTIONS.h
+Ccph >>>>>> !!!!!! SPECIAL SEAICE FLAG FOR TESTING !!!!!! <<<<<<
+C#define  SEAICE_EXCLUDE_FOR_EXACT_AD_TESTING
+Ccph >>>>>> !!!!!! SPECIAL SEAICE FLAG FOR TESTING !!!!!! <<<<<<
 
 C--   Write "text-plots" of certain fields in STDOUT for debugging.
 #undef SEAICE_DEBUG
@@ -51,16 +51,16 @@ C     set number of categories (nITD) in SEAICE_SIZE.h
 
 C--   Since the missing sublimation term is now included
 C     this flag is needed for backward compatibility
-#define SEAICE_DISABLE_SUBLIM
+#undef SEAICE_DISABLE_SUBLIM
 
 C--   Suspected missing term in coupled ocn-ice heat budget (to be confirmed)
-#define SEAICE_DISABLE_HEATCONSFIX
+#undef SEAICE_DISABLE_HEATCONSFIX
 
 C--   Default is constant seaice salinity (SEAICE_salt0); Define the following
 C     flag to consider (space & time) variable salinity: advected and forming
 C     seaice with a fraction (=SEAICE_saltFrac) of freezing seawater salinity.
 C- Note: SItracer also offers an alternative way to handle variable salinity.
-#define SEAICE_VARIABLE_SALINITY
+#undef SEAICE_VARIABLE_SALINITY
 
 C--   Tracers of ice and/or ice cover.
 #undef ALLOW_SITRACER
@@ -107,7 +107,7 @@ C     enable Krylov code by defining the following flag
 C     enable LSR to use global (multi-tile) tri-diagonal solver
 # undef SEAICE_GLOBAL_3DIAG_SOLVER
 C     enable EVP code by defining the following flag
-# define SEAICE_ALLOW_EVP
+# undef SEAICE_ALLOW_EVP
 # ifdef SEAICE_ALLOW_EVP
 C--   When set use SEAICE_zetaMin and SEAICE_evpDampC to limit viscosities
 C     from below and above in seaice_evp: not necessary, and not recommended
@@ -166,11 +166,14 @@ C     SEAICE_CAP_SUBLIM is not needed as of now, but kept just in case.
 #undef SEAICE_CAP_SUBLIM
 
 C--   Enable free drift code
-#undef SEAICE_ALLOW_FREEDRIFT
+#define SEAICE_ALLOW_FREEDRIFT
+
+C--   Adjointable sea ice growth code
+#define SEAICE_USE_GROWTH_ADX
 
 C--   pkg/seaice cost functions compile flags
 c       >>> Sea-ice volume (requires pkg/cost)
-#define ALLOW_COST_ICE
+#undef ALLOW_COST_ICE
 
 #endif /* ALLOW_SEAICE */
 #endif /* SEAICE_OPTIONS_H */
