@@ -1,0 +1,6 @@
+(PID.TID 0000.0001) ** WARNING ** SEAICE_READPARMS: will use AdvScheme = 2 for HEFF  without any diffusion
+(PID.TID 0000.0001) ** WARNING ** SEAICE_READPARMS: will use AdvScheme = 2 for AREA  without any diffusion
+(PID.TID 0000.0001) ** WARNING ** SEAICE_READPARMS: will use AdvScheme = 2 for HSNOW without any diffusion
+(PID.TID 0000.0001) ** WARNING ** SEAICE_READPARMS: since DIFF1 is set to 0 (= new DIFF1 default value)
+(PID.TID 0000.0001) ** Warning ** GRDCHK_READPARMS: ignores "data.grdchk" file since
+(PID.TID 0000.0001) ** Warning ** GRDCHK_READPARMS: useGrdChk= F (set from "data.pkg")

@@ -1,0 +1,32 @@
+mkdir adjfiles adxxfiles barfiles namelists
+mv ADJ* adjfiles
+mv adxx_* adxxfiles
+mv xx_* adxxfiles
+mv data* namelists
+mv eedata namelists
+mv m_* barfiles
+mv adm_* barfiles
+mv misfit* barfiles
+
+tar czvf GRID.tgz Angle* Depth* DR* DX* DY* hFac* mask* PHref* RA*.data RA*.meta RC.* RF* RhoRef* XC* XG* YC* YG* *zonDir* rLow* rSurf*
+rm Angle* Depth* DR* DX* DY* hFac* mask* PHref* RA*.data RA*.meta RC.* RF* RhoRef* XC* XG* YC* YG* *zonDir* rLow* rSurf*
+
+rm pickup*
+rm *1x1*
+rm *rec*_r4
+rm tapes*
+rm wunit*
+
+tar czvf output_dump.tgz AREA.* EmPmR.* Eta.* FU.* FV.* HEFF.* HSNOW.* PH.* PHL.* Qnet.* Qsw.* S.* T.* U.* V.* W.* UICE.* VICE.* UWIND.* VWIND.*
+rm AREA.* EmPmR.* Eta.* FU.* FV.* HEFF.* HSNOW.* PH.* PHL.* Qnet.* Qsw.* S.* T.* U.* V.* W.* UICE.* VICE.* UWIND.* VWIND.*
+
+tar czvf adjfiles.tgz adjfiles/
+tar czvf adxxfiles.tgz adxxfiles/
+tar czvf namelists.tgz namelists/
+
+rm -rf adjfiles
+rm -rf adxxfiles
+rm -rf namelists
+
+gzip -v ecco*
+gzip -v mitgcmuv_ad

@@ -2,15 +2,20 @@
 
   basedir=/workspace/atnguyen/sv-mnt-nansen/MITgcm_latest/MITgcm/verification/1D_ocean_ice_column
 
-sset='_Ice5mSnow5m'
+sset='_Ice5mSnow5m_SPoffFloodONSIsal0rhoSnow910albedo'
 echo $sset
 
-ext='_SPoffFloodONSIsal0rhoSnow910albedo'
+#PR
+ext=''
+##upstream/master
+#ext='_master'
+##upstream/master using seaice_growth.F
+#ext='_ADXoff'
 
   inputdir=$basedir/input_ad
   bindir=$basedir/dummy_bin
-  codedir=$basedir/code_ad
-  builddir=$basedir/build_ad
+  codedir=$basedir/code_ad$ext
+  builddir=$basedir/build_ad$ext
 
  workdir=$basedir/run${sset}${ext}
 
@@ -33,4 +38,4 @@ ext='_SPoffFloodONSIsal0rhoSnow910albedo'
 #  cp $bindir/ones_1x1x23 .
    ln -s $bindir/* ./
 
-  $workdir/mitgcmuv > $workdir/STDOUT.0000
+  $workdir/mitgcmuv_ad > $workdir/STDOUT.0000

@@ -7,10 +7,10 @@ echo $sset
 
 #PR
 ext=''
-#upstream/master
-ext='_master'
-#upstream/master using seaice_growth.F
-ext='_ADXoff'
+##upstream/master
+#ext='_master'
+##upstream/master using seaice_growth.F
+#ext='_ADXoff'
 
   inputdir=$basedir/input_ad
   bindir=$basedir/dummy_bin
