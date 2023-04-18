@@ -1141,14 +1141,21 @@ c     snow thickness over the 1/4 of the cell which is ice covered.
      &         SnowAccOverIce(I,J) -
      &         HSNOW(I,J,bi,bj)
 
+          IF(SEAICEuseFlooding) THEN
+C Latent heat of fusion associated with positive d_HEFFbyFlood. This
+C is the amount of heat that would be released to the ocean (ocean
+C would warm up) when positive d_HEFFbyFlood is formed
+            d_EnergybyFlood(I,J)=d_HEFFbyFlood(I,J)*recip_QI
+          ENDIF
+
 c     The energy required to melt or form the new ice volume
           EnergyInNewTotalIceVolume(I,J) =
      &         ActualNewTotalVolumeChange(I,J)*recip_QI
+C Here we remove d_EnergybyFlood because the conversion of flooded snow
+C to ice growth is treated as mass conversion without energy exchange.
+C See the manual under pkg/seaice Thermodynamics for more details.
+     &       - d_EnergybyFlood(I,J)
 c
-        IF(SEAICEuseFlooding) THEN
-          d_EnergybyFlood(I,J)=d_HEFFbyFlood(I,J)*recip_QI
-        ENDIF
-
 c     This is the net energy flux out of the ice+ocean system
 c     Remember -----
 c     F_ia_net : Under ice/snow surface freezing conditions,
@@ -1176,17 +1183,6 @@ c     change the ML temperature at all.
           ResidualEnergyOutOfOcean(I,J) =
      &             NetEnergyFluxOutOfOcean(I,J) -
      &             EnergyInNewTotalIceVolume(I,J)
-
-C Here we add d_EnergybyFlood directly into term for QNET
-C that goes to the ocean.  So, for diagnosing the portion
-C that is taken from ice, we need to make sure this heat is added
-C to SItflux, the term that is taken out of the ice+snow into QNET.
-C We also will diagnose the energy associated with d_EnergybyFlood
-C into SIfldflx
-        IF(SEAICEuseFlooding) THEN
-            ResidualEnergyOutOfOcean(I,J)=ResidualEnergyOutOfOcean(I,J)
-     &            +d_EnergybyFlood(I,J)
-        ENDIF
 
 C     NOW FORMULATE QNET
 C     THIS QNET DETERMINES THE TEMPERATURE CHANGE
