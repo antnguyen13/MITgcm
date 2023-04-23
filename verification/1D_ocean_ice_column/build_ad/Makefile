@@ -1,7 +1,7 @@
 # Multithreaded + multi-processing makefile for:
 #    Linux nansen 5.15.0-56-generic #62-Ubuntu SMP Tue Nov 22 19:54:14 UTC 2022 x86_64 x86_64 x86_64 GNU/Linux
 # This makefile was generated automatically on
-#    Tue Apr 11 10:29:42 PM CDT 2023
+#    Sun Apr 23 02:41:54 AM CDT 2023
 # by the command:
 #    ../../../tools/genmake2 -devel -mods=../code_ad
 # executed by:
@@ -1796,7 +1796,7 @@ BUILD_INFO.h:
 	@echo Creating $@ ...
 	-echo "#define THISVER 'checkpoint68o'" > $@
 	-echo "#define THISUSER 'atnguyen'" >> $@
-	-echo "#define THISDATE 'Tue Apr 11 10:29:42 PM CDT 2023'" >> $@
+	-echo "#define THISDATE 'Sun Apr 23 02:41:54 AM CDT 2023'" >> $@
 	-echo "#define THISHOST 'nansen'" >> $@
 
 # The normal chain of rules is (  .F - .f - .o  )
