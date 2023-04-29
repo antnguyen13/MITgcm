@@ -27,6 +27,8 @@ C Header file pkg/ICEPLUME
      &      useSheetPlume,
      &      useConePlume,
      &      useDetachPlume,
+     &      useTruncPlume,
+     &      useBuoyPlume,
      &      conserveMass,
      &      useInputPtracers
       LOGICAL usePlumeDiagnostics
@@ -34,12 +36,14 @@ C Header file pkg/ICEPLUME
       LOGICAL useSheetPlume
       LOGICAL useConePlume
       LOGICAL useDetachPlume
+      LOGICAL useTruncPlume
+      LOGICAL useBuoyPlume
       LOGICAL conserveMass
       LOGICAL useInputPtracers
 
       COMMON /ICEPLUME_FIELDS/
      &     runoffQsg,runoffQsg0,runoffQsg1,
-     &     plumeMask, 
+     &     plumeMask, plumeLength,
      &     temp_addMass3Dplume, salt_addMass3Dplume,
      &     addMass3Dplume,
      &     Qin
@@ -54,21 +58,24 @@ catn      _RL runoffVel1 (1-Olx:sNx+Olx,1-Oly:sNy+Oly,nSx,nSy)
 catn      _RL runoffRad  (1-Olx:sNx+Olx,1-Oly:sNy+Oly,nSx,nSy)
 catn      _RL runoffRad0 (1-Olx:sNx+Olx,1-Oly:sNy+Oly,nSx,nSy)
 catn      _RL runoffRad1 (1-Olx:sNx+Olx,1-Oly:sNy+Oly,nSx,nSy)
-      _RL plumeMask  (1-Olx:sNx+Olx,1-Oly:sNy+Oly,nSx,nSy)
-      _RL temp_addMass3Dplume  (1-OLx:sNx+OLx,1-Oly:sNy+Oly,Nr,nSx,nSy)
-      _RL salt_addMass3Dplume  (1-OLx:sNx+OLx,1-Oly:sNy+Oly,Nr,nSx,nSy)
-      _RL addMass3Dplume  (1-OLx:sNx+OLx,1-Oly:sNy+Oly,Nr,nSx,nSy)
+      _RL plumeMask(1-Olx:sNx+Olx,1-Oly:sNy+Oly,nSx,nSy)
+      _RL plumeLength(1-Olx:sNx+Olx,1-Oly:sNy+Oly,nSx,nSy)
+      _RL temp_addMass3Dplume(1-OLx:sNx+OLx,1-Oly:sNy+Oly,Nr,nSx,nSy)
+      _RL salt_addMass3Dplume(1-OLx:sNx+OLx,1-Oly:sNy+Oly,Nr,nSx,nSy)
+      _RL addMass3Dplume(1-OLx:sNx+OLx,1-Oly:sNy+Oly,Nr,nSx,nSy)
       _RS Qin (100)
 
       COMMON /ICEPLUME_FILES/
-     &	    runoffQsgfile,
-     &      plumeMaskFile
+     &      runoffQsgfile,
+     &      plumeMaskFile,
+     &      plumeLengthFile
 #ifdef ALLOW_EXF
      &     ,runoffQsgmask
 #endif /* ALLOW_EXF */
       CHARACTER*(MAX_LEN_FNAM)
-     &	    runoffQsgfile,
-     &      plumeMaskFile
+     &      runoffQsgfile,
+     &      plumeMaskFile,
+     &      plumeLengthFile
 #ifdef ALLOW_EXF
       CHARACTER*1 runoffQsgmask
 c runoffQsgmask will be 'c'
@@ -133,7 +140,7 @@ c MAX_LAT_INC=1279 in exf_interp_size
       _RL sProfPlume (Nr+1)
       _RL aProfPlume (Nr+1)   ! integrated area of plume from bottom
       _RL mIntProfPlume (Nr+1)   ! integrated melt of plume from bottom
-      _RL uProfPlume (Nr)     
+      _RL uProfPlume (Nr)
       _RL mProfPlume (Nr)
       _RL mProfAv    (Nr)
       _RL mProf      (Nr)
@@ -144,13 +151,13 @@ c MAX_LAT_INC=1279 in exf_interp_size
       _RL HeatFlux(Nr)
       _RL FwFlux(Nr)
       _RL delta_z(Nr)
-      
-#ifdef ICEPLUME_ALLOW_DETACHED_PLUME      
+
+#ifdef ICEPLUME_ALLOW_DETACHED_PLUME
       COMMON /ICEPLUME_FIELDS_DETACHED/
      & thetaProfPlume, distanceProfPlume
       _RL thetaProfPlume (Nr+1)
       _RL distanceProfPlume (Nr+1)
-#endif      
+#endif
 
 C     dLnormal     :: the model grid d[x,y]G that is normal to the glacier wall
 C     dLtangential :: the model grid d[x,y]G that is parallel to (i.e., along) the glacier wall
@@ -164,7 +171,7 @@ C     wVel_sg_0    :: initial vertical vel at point source, default to 1. m/s, u
 
       COMMON /ICEPLUME_PARM_R/
      &     E_0,
-     &     Q_sg, T_sg_0, S_sg_0, r_sg, w_sg,
+     &     Q_sg, T_sg_0, S_sg_0, r_sg, w_sg, L_sg,
      &     Angle_sg_0, wVel_sg_0,
      &     dLnormal, dLtangential,
      &     RTOL, ATOL,
@@ -175,9 +182,13 @@ C     wVel_sg_0    :: initial vertical vel at point source, default to 1. m/s, u
      &     GamT, GamS, Cd,
      &     sOutPlume, tOutPlume,
      &     iceDepth,
-     &     backgroundVel,
+     &     backgroundVelThresh,
      &     ptracerfluxSum,
-     &     maxDepth
+     &     maxDepth,
+     &     slopeTmod, interceptTmod
+#ifdef ICEPLUME_ALLOW_SCHULZ22
+     &    , GamTconst, GamSconst, facGamSGamT, Lp
+#endif
       _RS E_0
       _RL Angle_sg_0
       _RL wVel_sg_0
@@ -186,6 +197,7 @@ C     wVel_sg_0    :: initial vertical vel at point source, default to 1. m/s, u
       _RL Q_sg
       _RL w_sg
       _RL r_sg
+      _RL L_sg
       _RL dLnormal
       _RL dLtangential
       _RL RTOL
@@ -204,7 +216,15 @@ C     wVel_sg_0    :: initial vertical vel at point source, default to 1. m/s, u
       _RL gamT
       _RL cd
       _RL iceDepth
-      _RL backgroundVel
+      _RL backgroundVelThresh
+      _RL slopeTmod
+      _RL interceptTmod
+#ifdef ICEPLUME_ALLOW_SCHULZ22
+      _RL facGamSGamT
+      _RL GamTconst
+      _RL GamSconst
+      _RL Lp
+#endif
       _RL ptracerFluxSum
       _RL maxDepth
 
@@ -214,7 +234,7 @@ C     ICEPLUMElatentHeat       :: latent heat of fusion (def: 334000 J/kg)
 C     ICEPLUMEheatCapacity_Cp  :: Heat Capacity of shelfice (def: 2000. J/kg)
 
       COMMON /ICEPLUME_PARMS_R/
-     &     ICEPLUMElatentHeat, 
+     &     ICEPLUMElatentHeat,
      &     ICEPLUMEheatCapacity_Cp
       _RL ICEPLUMElatentHeat
       _RL ICEPLUMEheatCapacity_Cp
@@ -246,12 +266,12 @@ C Parameters relating to PTRACERS
      &     (1-OLx:sNx+OLx,1-Oly:sNy+Oly,Nr,nSx,nSy,PTRACERS_num)
       _RL ptracerMask
      &     (1-Olx:sNx+Olx,1-Oly:sNy+Oly,PTRACERS_num,nSx,nSy)
-   
+
       COMMON /ICEPLUME_PTRACERS_FILES/
      &     ptracerMaskFile
-      CHARACTER*(512) 
+      CHARACTER*(512)
      &     ptracerMaskFile
 
 #endif /* ALLOW_PTRACERS */
 
-# endif /* ALLOW_ICEPLUME */ 
+# endif /* ALLOW_ICEPLUME */
