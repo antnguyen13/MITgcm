@@ -1,0 +1,10 @@
+# Multithreaded + multi-processing makefile for:
+#    Linux sverdrup.ices.utexas.edu 3.10.0-693.5.2.el7.x86_64 #1 SMP Fri Oct 20 20:32:50 UTC 2017 x86_64 x86_64 x86_64 GNU/Linux
+# This makefile was generated automatically on
+#    Tue Sep 27 12:57:21 CDT 2022
+# by the command:
+#    ../../../../MITgcm/tools/genmake2 -rd=../../../../MITgcm -mods=../code -of=/home/atnguyen/nansen/computing/optfiles/optfile_mvapich2_sverdrup -mpi
+# executed by:
+#    atnguyen@sverdrup.ices.utexas.edu:/home/atnguyen/nansen/MITgcm_c68k/mysetups/Cowton2015/iceplume_testcase/build
+#
+# OPTFILE="/home/atnguyen/nansen/computing/optfiles/optfile_mvapich2_sverdrup"
