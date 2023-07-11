@@ -149,10 +149,12 @@ c sum for display of time series
       enddo
 
 c global sums for display of time series
+c note that this is only for cosmetic, the fc should match
+c the last record if gencost_preproc_i(1,kgen)=-1
       CALL GLOBAL_SUM_TILE_RL( tmpSumTile, tmpSumGlo, myThid )
 
       WRITE(msgBuf,'(A,I3,A,1PE21.14)')
-     &    'boxmean/horflux :',irec,' ',tmpSumGlo
+     &    'boxmean/boxcont/horflux :',irec,' ',tmpSumGlo
       CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
      &    SQUEEZE_RIGHT, myThid )
 
@@ -164,7 +166,8 @@ c global sums for cost function
       CALL GLOBAL_SUM_TILE_RL( objf_gencost(1,1,kgen),
      &   mySumGlo, myThid )
 
-      WRITE(msgBuf,'(A,1PE21.14)') 'boxmean/horflux fc :',mySumGlo
+      WRITE(msgBuf,'(A,1PE21.14)')
+     &    'boxmean/boxcont/horflux fc :',mySumGlo
       CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
      &    SQUEEZE_RIGHT, myThid )
 

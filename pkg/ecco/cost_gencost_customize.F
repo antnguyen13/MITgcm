@@ -129,6 +129,27 @@ c    &     .TRUE.,.TRUE.,.TRUE.,1,myThid)
          elseif (gencost_barfile(k)(1:9).EQ.'m_boxmean') then
            gencost_modfld(i,j,bi,bj,k) =
      &      gencost_storefld(i,j,bi,bj,k)
+         elseif (gencost_barfile(k)(1:9).EQ.'m_boxcont') then
+           gencost_modfld(i,j,bi,bj,k) =
+     &      gencost_storefld(i,j,bi,bj,k)
+#ifdef ALLOW_GENCOST_DTHETADR
+          if (gencost_barfile(k)(1:18).EQ.'m_boxmean_dthetadr') then
+           kk=gencost_pointer3d(k)
+           do k2=1,nr
+            gencost_mod3d(i,j,k2,bi,bj,kk) =
+     &       sigmaRfield(i,j,k2,bi,bj)*maskC(i,j,k2,bi,bj)
+           enddo
+          endif
+#endif /* ALLOW_GENCOST_DTHETADR */
+#ifdef ALLOW_GENCOST_SIGMAR
+          if (gencost_barfile(k)(1:16).EQ.'m_boxmean_sigmaR') then
+           kk=gencost_pointer3d(k)
+           do k2=1,nr
+            gencost_mod3d(i,j,k2,bi,bj,kk) =
+     &       sigmaRfield(i,j,k2,bi,bj)*maskC(i,j,k2,bi,bj)
+           enddo
+          endif
+#endif /* ALLOW_GENCOST_SIGMAR */
          elseif (gencost_barfile(k)(1:9).EQ.'m_horflux') then
            gencost_modfld(i,j,bi,bj,k) =
      &      gencost_storefld(i,j,bi,bj,k)
@@ -221,6 +242,12 @@ c    &     .TRUE.,.TRUE.,.TRUE.,1,myThid)
          elseif (gencost_barfile(k)(1:9).EQ.'m_sihsnow') then
            gencost_modfld(i,j,bi,bj,k) =
      &      hsnow(i,j,bi,bj)*maskC(i,j,1,bi,bj)
+         elseif (gencost_barfile(k)(1:8).EQ.'m_siuice') then
+           gencost_modfld(i,j,bi,bj,k) =
+     &      uice(i,j,bi,bj)*maskW(i,j,1,bi,bj)
+         elseif (gencost_barfile(k)(1:8).EQ.'m_sivice') then
+           gencost_modfld(i,j,bi,bj,k) =
+     &      vice(i,j,bi,bj)*maskS(i,j,1,bi,bj)
 #endif
 #ifdef ALLOW_GENCOST3D
          elseif (gencost_barfile(k)(1:7).EQ.'m_theta') then
@@ -255,6 +282,15 @@ c    &     .TRUE.,.TRUE.,.TRUE.,1,myThid)
             gencost_mod3d(i,j,k2,bi,bj,kk) =
      &       m_VN(i,j,k2,bi,bj)*maskC(i,j,k2,bi,bj)
            enddo
+#ifdef ALLOW_GENCOST_SIGMAR
+         elseif (gencost_barfile(k)(1:8).EQ.'m_sigmaR') then
+           kk=gencost_pointer3d(k)
+           do k2=1,nr
+            gencost_mod3d(i,j,k2,bi,bj,kk) =
+     &       sigmaRfield(i,j,k2,bi,bj)*maskC(i,j,k2,bi,bj)
+           enddo
+#endif
+#ifdef ALLOW_GENCOST_TRANSPORT
          elseif (gencost_barfile(k)(1:7).EQ.'m_trVol') then
            kk=gencost_pointer3d(k)
            do k2=1,nr
@@ -270,6 +306,7 @@ c    &     .TRUE.,.TRUE.,.TRUE.,1,myThid)
            do k2=1,nr
              gencost_mod3d(i,j,k2,bi,bj,kk) = trSalt(i,j,k2,bi,bj)
            enddo
+#endif
 #if (defined (ALLOW_3D_DIFFKR) || defined (ALLOW_DIFFKR_CONTROL))
          elseif (gencost_barfile(k)(1:8).EQ.'m_diffkr') then
            kk=gencost_pointer3d(k)

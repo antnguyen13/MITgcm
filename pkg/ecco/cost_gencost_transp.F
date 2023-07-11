@@ -33,6 +33,7 @@ C     == external functions ==
 C     == local variables ==
       INTEGER nrecloc, localrec
       INTEGER localstartdate(4)
+      INTEGER jrec(366),nrecloc1,preproci
 
       _RL myobs   (1-OLx:sNx+OLx,1-OLy:sNy+OLy,Nr,nSx,nSy)
       _RL mybar   (1-OLx:sNx+OLx,1-OLy:sNy+OLy,Nr,nSx,nSy)
@@ -40,7 +41,10 @@ C     == local variables ==
       _RL difmask (1-OLx:sNx+OLx,1-OLy:sNy+OLy,Nr,nSx,nSy)
       _RL localtmp(1-OLx:sNx+OLx,1-OLy:sNy+OLy,Nr,nSx,nSy)
 
-      _RL dummy, facCost, facNum
+      _RL dummy, facCost, facNum, lengthrec,preprocr,tempb
+      _RL ifactor(366)
+      _RL templength,tempr
+      integer tempi,tempa,tempc
       _RL localperiod
       _RL spminloc, spmaxloc, spzeroloc
       _RL tmpMeanTile(nSx,nSy), tmpNumTile(nSx,nSy)
@@ -70,7 +74,15 @@ C- facNum is 1 divided by the number of tiles in SIZE dot h
       facNum = nSx*nPx
       facNum = 1. _d 0 / facNum
 
-C-- detect the relevant gencost indices
+      do k=1,366
+        ifactor(k)=0.0 _d 0
+        jrec(k)=-1
+      enddo
+      preproci=0
+      preprocr=0.0 _d 0
+      lengthrec=0.0 _d 0
+      templength=0.0 _d 0
+c-- detect the relevant gencost indices
       do k=1,NGENCOST3D
         kgen(k)=0
       enddo
@@ -113,12 +125,19 @@ C-- initialize objf and num:
 C--   Initialise local variables.
         nrecloc=0
         nrecloc=gencost_nrec(kgen(icount))
+        templength=0.0 _d 0
+        if(gencost_avgperiod(kgen(icount)).EQ.'month') then
+          templength=12.0 _d 0
+        elseif(gencost_avgperiod(kgen(icount)).EQ.'day') then
+          templength=365.0 _d 0
+        else
+          templength=0.0 _d 0
+        endif
+
+        lengthrec=templength
 
 C-- only enters if there is at least 1 record
         if(nrecloc.gt.0) then
-
-          facCost = nrecloc
-          facCost = 1. _d 0 / facCost
 
           localperiod=0.
           localperiod=gencost_period(kgen(icount))
@@ -131,6 +150,8 @@ C prefer to have preproc match nosumsq but can not seem to get syntax
 C to work for comparison of characters so match dosumsq for now.
           dosumsq=.FALSE.
           dovarwei=.FALSE.
+          tempi=0
+          tempr=0.0 _d 0
           do k2 = 1, NGENPPROC
             preproc(k2)=gencost_preproc(k2,kgen(icount))
             preproc_i(k2)=gencost_preproc_i(k2,kgen(icount))
@@ -138,7 +159,78 @@ C to work for comparison of characters so match dosumsq for now.
             preproc_r(k2)=gencost_preproc_r(k2,kgen(icount))
             if (preproc(k2).EQ.'variaweight') dovarwei=.TRUE.
             if (preproc(k2)(1:7).EQ.'dosumsq') dosumsq=.TRUE.
+
+C preproc_I -1: entire record, 0: 1yr, 1-12 = one month, whichever month chosen
+c preproc_r: -1.0 = last record, +1.0 = avg
+            if(preproc_i(k2).ne.0) then
+              tempi=preproc_i(k2)
+              tempr=preproc_r(k2)
+            endif
           enddo
+          preproci=tempi
+          preprocr=tempr
+
+c construct a 1-d array of record month, assuming monthly:
+          WRITE(msgBuf,'(A,I5,I5,2X,F7.4)')
+     &      'nrecloc,preproci,preprocr: ',
+     &       nrecloc,preproci,preprocr
+          CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+     &                        SQUEEZE_RIGHT, myThid )
+          nrecloc1=0
+          WRITE(msgBuf,'(A)')
+     &      'irec,temp[a,b,c],jrec,nrecloc1,ifactor: '
+          CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+     &                        SQUEEZE_RIGHT, myThid )
+          do irec=1,nrecloc
+            ifactor(irec)=0.0 _d 0
+            tempa=int(lengthrec)
+            tempb=mod(irec,tempa)
+            tempc=int(nrecloc/tempa)*tempa
+            if(tempc.gt.tempa) then
+              if(tempc.eq.nrecloc) then
+                tempc=tempc-tempa+1
+              else
+                tempc=tempc-tempa
+              endif
+            endif
+            jrec(irec)=tempb
+            if(jrec(irec).eq.0) jrec(irec)=tempa
+
+c now create ifactor to keep which ever months
+c last rec:
+            if(preprocr.lt.0.0) then
+              if(preproci.eq.-2) then
+                ifactor(irec)=1.0 _d 0
+              elseif(preproci.eq.-1) then
+                if(irec.gt.tempc) ifactor(irec)=1.0 _d 0
+              elseif(preproci.gt.0) then
+                if((irec.gt.tempc).and.(jrec(irec).eq.preproci))
+     &             ifactor(irec)=1.0 _d 0
+              endif
+            elseif(preprocr.gt.0.0) then
+              if(preproci.lt.0) then
+                ifactor(irec)=1.0 _d 0
+              elseif(preproci.gt.0) then
+                if(jrec(irec).eq.preproci) ifactor(irec)=1.0 _d 0
+              endif
+            endif
+
+            nrecloc1=nrecloc1+ifactor(irec)
+            WRITE(msgBuf,'(2(I5,1X),F7.4,3(I5,1X),F7.4)')
+     &         irec,tempa,tempb,tempc,jrec(irec),nrecloc1,ifactor(irec)
+            CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+     &                          SQUEEZE_RIGHT, myThid )
+          enddo
+
+          if(nrecloc1.gt.0) then
+            facCost=1.0 _d 0 / float(nrecloc1)
+          else
+            facCost=0.0 _d 0
+          endif
+          WRITE(msgBuf,'(A,I10,1X,F14.7)') 'nrecloc1,facCost: ',
+     &      nrecloc1,facCost
+          CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+     &                        SQUEEZE_RIGHT, myThid )
 
 C-- report of dosumsq flag to make sure it is false
           il=ILNBLNK(gencost_name(kgen(icount)))
@@ -250,12 +342,16 @@ C note tmpNumGlo is the constant total wet points in the gencost_mask[W,S]
      &                          SQUEEZE_RIGHT, myThid )
 
 C sum that is actually be used in cost function
+catn keep only last month:
+c          if(irec.eq.nrecloc)then
             DO bj = myByLo(myThid), myByHi(myThid)
              DO bi = myBxLo(myThid), myBxHi(myThid)
                objf_gencost(bi,bj,kgen(icount))=
      &            objf_gencost(bi,bj,kgen(icount))+tmpMeanTile(bi,bj)
+     &                                             *ifactor(irec)
              ENDDO
             ENDDO
+c          endif
 
           enddo !irec
 
@@ -266,7 +362,8 @@ C-- make num_gencost equals number of months/days used
            DO bi = myBxLo(myThid), myBxHi(myThid)
              objf_gencost(bi,bj,kgen(icount))=
      &          objf_gencost(bi,bj,kgen(icount))*facCost
-             num_gencost(bi,bj,kgen(icount))=nrecloc*facNum
+             num_gencost(bi,bj,kgen(icount))=nrecloc1*facNum
+
            ENDDO
           ENDDO
 

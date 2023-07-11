@@ -138,14 +138,30 @@ c--    set time averaging parameters
            STOP
      &      'ecco_cost_init_fixed: gencost_avgperiod wrongly specified'
          endif
+catn: gencost_nrecperiod is retired, use gencost_posproc clim,
+catn  unsure how to use that relative to the commented out below
+catn         if ( gencost_nrecperiod(k).EQ.0)
+catn     &     gencost_nrecperiod(k)=gencost_nrec(k)
        endif
 
 c--    set observation start/enddate
        if (gencost_startdate1(k).GT.0) then
-         call cal_FullDate(
-     &     gencost_startdate1(k), gencost_startdate2(k),
-     &     gencost_startdate(1,k), myThid )
+catn check if model startdate is later than obs startdate
+c the reason: if data starts from 1992 but model run from 2002
+c STDOUT still reports model opening obs file starting from 1992
+c which is not nesc.
+         if(gencost_startdate1(k).GE.modelStartDate(1)) then
+           call cal_FullDate(
+     &       gencost_startdate1(k), gencost_startdate2(k),
+     &       gencost_startdate(1,k), myThid )
+         else
+           call cal_CopyDate(modelStartDate,
+     &       gencost_startdate(1,k),myThid)
+           gencost_startdate1(k)=startdate_1
+           gencost_startdate2(k)=startdate_2
+         endif
        else
+catn else overwrite startdate to coincide with modelStartDate
          call cal_CopyDate(modelStartDate,
      &     gencost_startdate(1,k),myThid)
          gencost_startdate1(k)=startdate_1
@@ -153,9 +169,16 @@ c--    set observation start/enddate
        endif
 
        if (gencost_enddate1(k).GT.0) then
-         call cal_FullDate(
-     &     gencost_enddate1(k), gencost_enddate2(k),
-     &     gencost_enddate(1,k), myThid )
+catn check if model enddate is earlier than obs enddate
+         if(gencost_enddate1(k).LE.modelEndDate(1)) then
+           call cal_FullDate(
+     &       gencost_enddate1(k), gencost_enddate2(k),
+     &       gencost_enddate(1,k), myThid )
+         else
+catn else overwrite enddate to coincide with modelEndDate
+           call cal_CopyDate(modelEndDate,
+     &       gencost_enddate(1,k),myThid)
+         endif
        else
          call cal_CopyDate(modelEndDate,
      &     gencost_enddate(1,k),myThid)

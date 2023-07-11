@@ -41,7 +41,7 @@ C     myThid -  Number of this instances
       INTEGER myThid
 
 c     == external functions ==
-      INTEGER  ILNBLNk
+      INTEGER  ILNBLNK
       EXTERNAL ILNBLNK
 
 C     === Local variables ===
@@ -432,7 +432,9 @@ c-- also not checked for variwei at the moment
             ENDIF
 
             IF ((gencost_mask(k) .NE. ' ').AND.
-     &          (gencost_barfile(k)(1:9).EQ.'m_boxmean')) THEN
+     &          ((gencost_barfile(k)(1:9).EQ.'m_boxmean').OR.
+     &           (gencost_barfile(k)(1:9).EQ.'m_boxcont')))
+     &       THEN
              il = ILNBLNK(gencost_mask(k))
              WRITE(tempfile(1:128),'(2A)') gencost_mask(k)(1:il),'C'
              inquire( file=tempfile(1:il+1), exist=exst )
@@ -461,7 +463,10 @@ c-- also not checked for variwei at the moment
                CALL PRINT_MESSAGE( msgBuf, errorMessageUnit,
      &                    SQUEEZE_RIGHT , myThid)
              ENDIF
-c
+            ENDIF
+
+            IF ((gencost_mask(k) .ne. ' ').AND.
+     &          (gencost_barfile(k)(1:9).EQ.'m_horflux')) THEN
              il = ILNBLNK(gencost_mask(k))
              WRITE(tempfile(1:128),'(2A)') gencost_mask(k)(1:il),'S'
              inquire( file=tempfile(1:il+1), exist=exst )
@@ -486,7 +491,23 @@ c-- (upper/lower-case matters) in cost_gencost_customize
      &          (gencost_barfile(k)(1:13).EQ.'m_boxmean_vol').OR.
      &          (gencost_barfile(k)(1:16).EQ.'m_boxmean_shifwf').OR.
      &          (gencost_barfile(k)(1:16).EQ.'m_boxmean_shihtf').OR.
-     &          (gencost_barfile(k)(1:13).EQ.'m_horflux_vol')
+#ifdef ALLOW_SEAICE
+     &          (gencost_barfile(k)(1:14).EQ.'m_boxmean_area') .OR.
+     &          (gencost_barfile(k)(1:14).EQ.'m_boxmean_heff') .OR.
+#endif /* ALLOW_SEAICE */
+     &          (gencost_barfile(k)(1:14).EQ.'m_boxcont_heat') .OR.
+     &          (gencost_barfile(k)(1:14).EQ.'m_boxcont_salt') .OR.
+     &          (gencost_barfile(k)(1:12).EQ.'m_boxcont_fw') .OR.
+     &          (gencost_barfile(k)(1:13).EQ.'m_horflux_vol') .OR.
+     &          (gencost_barfile(k)(1:15).EQ.'m_horflux_theta') .OR.
+     &          (gencost_barfile(k)(1:14).EQ.'m_horflux_salt') .OR.
+#ifdef ALLOW_GENCOST_SIGMAR
+     &          (gencost_barfile(k)(1:16).EQ.'m_boxmean_sigmaR') .OR.
+#endif /* ALLOW_GENCOST_SIGMAR */
+#ifdef ALLOW_GENCOST_DTHETADR
+     &          (gencost_barfile(k)(1:18).EQ.'m_boxmean_dthetadr') .OR.
+#endif /* ALLOW_GENCOST_DTHETADR */
+     &          (gencost_barfile(k)(1:4).EQ.'m_bp')
      &        )) THEN
             using_gencost(k)=.FALSE.
             il=ILNBLNK(gencost_barfile(k))

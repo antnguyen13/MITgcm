@@ -2,6 +2,9 @@
 #ifdef ALLOW_SHELFICE
 # include "SHELFICE_OPTIONS.h"
 #endif
+#ifdef ALLOW_SEAICE
+# include "SEAICE_OPTIONS.h"
+#endif
 
 C---+----1----+----2----+----3----+----4----+----5----+----6----+----7-|--+----|
 CBOP
@@ -26,6 +29,11 @@ c     == global variables ==
 #ifdef ALLOW_ECCO
 # include "ECCO_SIZE.h"
 # include "ECCO.h"
+#endif
+#ifdef ALLOW_SEAICE
+# include "SEAICE_SIZE.h"
+# include "SEAICE_PARAMS.h"
+# include "SEAICE.h"
 #endif
 #ifdef ALLOW_PTRACERS
 # include "PTRACERS_SIZE.h"
@@ -52,6 +60,39 @@ C     i, j, k   :: loop indices
       _RL areavolTile(nSx,nSy), areavolGlob
       _RL tmpfld, tmpvol, tmpmsk, tmpmsk2, tmpmskW, tmpmskS
       _RL tmp_sigmsk, tmpsig, tmpsig_lower, tmpsig_upper
+      _RL tmpfluxS, tmpfluxW
+c here add local vars for full horflux (from code written by Nora Loose)
+c localT      ::  local copy of tracer field to compute gmredi transport
+c tmp2dmskW   ::  copy of cell area mask to compute gmredi transports
+c tmp2dmskS   ::  copy of cell area mask to compute gmredi transports
+c tmp3dmskW   ::  copy of section mask
+c tmp3dmskS   ::  copy of section mask
+c trIdentity  ::  =1 for theta, =2 for salt
+c diffKh      ::  =diffKhT for theta, = diffKhS for salt
+c df[x,y]     ::  field of diffusive fluxes
+      integer trIdentity
+      _RL diffKh
+      _RL localT  (1-OLx:sNx+OLx,1-OLy:sNy+OLy,Nr)
+      _RL tmp2dmskW  (1-OLx:sNx+OLx,1-OLy:sNy+OLy)
+      _RL tmp2dmskS  (1-OLx:sNx+OLx,1-OLy:sNy+OLy)
+      _RL tmp3dmskW  (1:sNx,1:sNy,Nr)
+      _RL tmp3dmskS  (1:sNx,1:sNy,Nr)
+      _RL dfx  (1-OLx:sNx+OLx,1-OLy:sNy+OLy)
+      _RL dfy  (1-OLx:sNx+OLx,1-OLy:sNy+OLy)
+
+#ifdef ALLOW_GENCOST_DTHETADR
+      integer k1,k2,i1(nr),j1(nr),bi1(nr),bj1(nr),kdthetadr
+      integer icount,nstep
+      _RL dthetadr, dthetaL, dthetaR, xC0, yC0, zC0, ss
+      _RL Tcutoff,lonline,latlower,latupper
+#endif
+#ifdef ALLOW_GENCOST_SIGMAR
+      _RL rhoKp1  (1-OLx:sNx+OLx,1-OLy:sNy+OLy)
+      _RL rhoKm1  (1-OLx:sNx+OLx,1-OLy:sNy+OLy)
+      _RL sigmaX  (1-OLx:sNx+OLx,1-OLy:sNy+OLy,Nr)
+      _RL sigmaY  (1-OLx:sNx+OLx,1-OLy:sNy+OLy,Nr)
+      _RL sigmaR  (1-OLx:sNx+OLx,1-OLy:sNy+OLy,Nr)
+#endif
 #endif
 
 C- note: defined with overlap here, not needed, but more efficient
@@ -61,6 +102,7 @@ C- note: defined with overlap here, not needed, but more efficient
       _RL trHeatS(1-OLx:sNx+OLx,1-OLy:sNy+OLy,Nr)
       _RL trSaltW(1-OLx:sNx+OLx,1-OLy:sNy+OLy,Nr)
       _RL trSaltS(1-OLx:sNx+OLx,1-OLy:sNy+OLy,Nr)
+      _RL T_ref,S_ref,temp
 
       _RL tmpfac
       _RL sIceLoadFacLoc
@@ -72,6 +114,7 @@ C- note: defined with overlap here, not needed, but more efficient
       _RL sterht  (1-OLx:sNx+OLx,1-OLy:sNy+OLy,nSx,nSy)
 #endif
 #endif
+CcHP adding Nora's changeset for implementing full horflux cost
       _RL rhoLoc(1-OLx:sNx+OLx,1-OLy:sNy+OLy,Nr,nSx,nSy)
 #ifdef ALLOW_PSBAR_STERIC
       _RL VOLsumTile(nSx,nSy), RHOsumTile(nSx,nSy)
@@ -81,6 +124,9 @@ c     CHARACTER*(MAX_LEN_MBUF) msgBuf
 C     Mload     :: total mass load (kg/m**2)
 c     _RL Mload(1-OLx:sNx+OLx,1-OLy:sNy+OLy,nSx,nSy)
 CEOP
+
+      T_ref = -1.9 _d 0
+      S_ref = 34.8 _d 0
 
       tmpfac = recip_rhoConst*recip_gravity
       sIceLoadFacLoc = zeroRL
@@ -312,6 +358,157 @@ c-- init
 
 #ifdef ALLOW_GENCOST_CONTRIBUTION
 
+C---+----1----+----2----+----3----+----4----+----5----+----6----+----7-|--+----|
+#ifdef ALLOW_GENCOST_SIGMAR
+c copy from do_oceanc_phys.F
+      DO bj=myByLo(myThid),myByHi(myThid)
+       DO bi=myBxLo(myThid),myBxHi(myThid)
+
+        DO k=1,Nr
+         DO j=1-OLy,sNy+OLy
+          DO i=1-OLx,sNx+OLx
+C This is currently used by GMRedi, IVDC, MXL-depth  and Diagnostics
+           sigmaX(i,j,k) = 0. _d 0
+           sigmaY(i,j,k) = 0. _d 0
+           sigmaR(i,j,k) = 0. _d 0
+          ENDDO
+         ENDDO
+        ENDDO
+
+        DO j=1-OLy,sNy+OLy
+         DO i=1-OLx,sNx+OLx
+          rhoKm1 (i,j)   = 0. _d 0
+          rhoKp1 (i,j)   = 0. _d 0
+         ENDDO
+        ENDDO
+
+c------ k loop in reverse
+        DO k=Nr,1,-1
+         IF (k.GT.1) THEN
+                   CALL FIND_RHO_2D(
+     I                 1-OLx, sNx+OLx, 1-OLy, sNy+OLy, k,
+     I                 theta(1-OLx,1-OLy,k-1,bi,bj),
+     I                 salt (1-OLx,1-OLy,k-1,bi,bj),
+     O                 rhoKm1,
+     I                 k-1, bi, bj, myThid )
+         ENDIF
+         DO j=1-OLy,sNy+OLy
+          DO i=1-OLx,sNx+OLx
+           rhoKp1(i,j) = rhoInSitu(i,j,k,bi,bj)
+          ENDDO !i
+         ENDDO  !j
+         CALL GRAD_SIGMA(
+     I          bi, bj, 1-OLx, sNx+OLx, 1-OLy, sNy+OLy, k,
+     I          rhoInSitu(1-OLx,1-OLy,k,bi,bj), rhoKm1, rhoKp1,
+     O          sigmaX, sigmaY, sigmaR,
+     I          myThid )
+
+         DO j=1-OLy,sNy+OLy
+          DO i=1-OLx,sNx+OLx
+           sigmaRfield(i,j,k,bi,bj)=sigmaR(i,j,k)
+          ENDDO  !i
+         ENDDO   !j
+        ENDDO    !k
+c--- done k loop
+       ENDDO    !bi
+      ENDDO     !bj
+#endif /* ALLOW_GENCOST_SIGMAR */
+
+C---+----1----+----2----+----3----+----4----+----5----+----6----+----7-|--+----|
+#ifdef ALLOW_GENCOST_DTHETADR
+      kdthetadr=0
+      DO kgen=1,NGENCOST
+        IF (gencost_barfile(kgen)(1:18).EQ.'m_boxmean_dthetadr') THEN
+          Tcutoff  = gencost_preproc_r(1,kgen)
+          lonline  = gencost_preproc_r(2,kgen)
+          latlower = gencost_preproc_r(3,kgen)
+          latupper = gencost_preproc_r(4,kgen)
+          k1=gencost_preproc_i(1,kgen)
+          k2=gencost_preproc_i(2,kgen)
+          kdthetadr = kgen
+        ENDIF
+      ENDDO
+
+      IF(kdthetadr .GT. 0) THEN
+       DO k=1,nr
+        bi1(k)=0
+        bj1(k)=0
+        i1(k)=0
+        j1(k)=0
+       ENDDO
+       dthetadr=0. _d 0
+       DO bj=myByLo(myThid),myByHi(myThid)
+        DO bi=myBxLo(myThid),myBxHi(myThid)
+         DO j=2,sNy-1
+          DO i=2,sNx-1
+c- cant tell at the moment if this is along i or j, assume i for now
+           IF((abs(xc(i,j,bi,bj)-(lonline)).LT. 0.001 _d 0) .AND.
+     &            (yc(i,j,bi,bj).GT. latlower  .AND.
+     &             yc(i,j,bi,bj).LT. latupper)) THEN
+            dthetaL = 0. _d 0
+            dthetaR = 0. _d 0
+            DO k=k1,k2
+
+             IF((hFacC(i-1,j,k  ,bi,bj).GT.0.9 _d 0 .AND.
+     &           hFacC(i  ,j,k  ,bi,bj).GT.0.9 _d 0      ).AND.
+     &          (hFacC(i-1,j,k+1,bi,bj).GT.0.9 _d 0 .AND.
+     &           hFacC(i  ,j,k+1,bi,bj).GT.0.9 _d 0      )) THEN
+
+              dthetaL=theta(i-1,j,k  ,bi,bj)-Tcutoff
+              dthetaR=theta(i  ,j,k  ,bi,bj)-Tcutoff
+
+              IF (dthetaL.LT.0. _d 0 .AND. dthetaR.GE.0. _d 0) THEN
+                 bi1(k) = bi
+                 bj1(k) = bj
+                 i1(k)  = i
+                 j1(k)  = j
+              ENDIF
+             ENDIF  !hFacC=1.0
+            ENDDO !k=k1,k2
+           ENDIF
+          ENDDO   !i
+         ENDDO    !j
+        ENDDO     !bi
+       ENDDO      !bj
+
+c-- now compute gradient d distance dz
+
+c-- dthetadr: the slope in m_hor/m_ver of the isothermal line Tcutoff
+       dthetadr = 0. _d 0
+       icount   = 0
+       DO k=k1,k2
+        IF(   (bi1(k).GT.0.AND.bi1(k+1).GT.0)
+     &   .AND.(bj1(k).GT.0.AND.bj1(k+1).GT.0) ) THEN
+
+         ss=1. _d 0
+         nstep = 1
+c         xC0 = 0. _d 0
+c         yC0 = 0. _d 0
+         zC0 = 0. _d 0
+         i=i1(k)
+         j=j1(k)
+         bi=bi1(k)
+         bj=bj1(k)
+
+c- note overestimate the slope by 1 grid point
+c- because vertical slope is infinite (dz/dx) or zero (dx/dz)
+         IF(i1(k).LE.i1(k+1)) THEN
+c          do i=i1(k),i1(k+1),nstep
+c           xC0 = xC0 + dxC(i,j,bi,bj)*ss
+c          enddo
+          zC0 = zC0 + drC(k+1)
+          icount = icount + 1
+          dthetaR = theta(i,j,k+1,bi,bj)-theta(i,j,k,bi,bj)
+c          dthetadr = dthetadr + ss*SQRT(xC0*xC0+yC0*yC0)/zC0
+          dthetadr = dthetadr + dthetaR/zC0
+         ENDIF
+        ENDIF
+       ENDDO
+       IF(icount .GT. 0) dthetadr = dthetadr / icount
+
+      ENDIF!kdthetadr               !}}} [dthetadr]
+
+#endif /* ALLOW_GENCOST_DTHETADR */
 cts ---
 c First: Fill the following SCALAR masks & weights for each (i,j,k,bi,bj) grid cell
 c   tmpvol - 3D cell volume
@@ -325,6 +522,9 @@ cts ---
 
        itr = gencost_itracer(kgen)
 
+catn init to avoid recomp
+       diffKh = 0. _d 0
+
        CALL ECCO_ZERO( gencost_storefld(1-OLx,1-OLy,1,1,kgen),
      &                 1, zeroRL, myThid )
 
@@ -334,6 +534,17 @@ cts ---
         ENDDO
        ENDDO
        areavolGlob=0. _d 0
+
+cHP adding Nora's changeset for implementing full horflux cost
+       IF (gencost_barfile(kgen)(1:15).EQ.'m_horflux_theta') THEN
+        trIdentity = 1
+        diffKh = diffKhT
+       ELSEIF (gencost_barfile(kgen)(1:14).EQ.'m_horflux_salt') THEN
+        trIdentity = 2
+        diffKh = diffKhS
+       ELSE
+        diffKh = 0. _d 0
+       ENDIF
 
        DO bj=myByLo(myThid),myByHi(myThid)
         DO bi=myBxLo(myThid),myBxHi(myThid)
@@ -405,6 +616,28 @@ cts ---
 #endif /* ALLOW_PTRACERS */
             ENDIF
 
+            IF (gencost_barfile(kgen)(1:14).EQ.'m_boxcont_heat') THEN
+              tmpfld=theta(i,j,k,bi,bj)*HeatCapacity_Cp*rhoConst
+              IF (tmpmsk.NE.0. _d 0) tmpmsk2=1. _d 0
+            ELSEIF (gencost_barfile(kgen)(1:14).EQ.'m_boxcont_salt')
+     &        THEN
+              tmpfld=salt(i,j,k,bi,bj)*rhoConst/1000.
+              IF (tmpmsk.NE.0. _d 0) tmpmsk2=1. _d 0
+            ELSEIF (gencost_barfile(kgen)(1:12).EQ.'m_boxcont_fw') THEN
+catn implemented here
+              tmpfld=1. _d 0 -(salt(i,j,k,bi,bj)/S_ref)
+              IF (tmpfld.LE. 0. _d 0) tmpfld = 0. _d 0
+              IF (tmpmsk.NE.0. _d 0) tmpmsk2=1. _d 0
+catn: note the sigmar and dthetadr will need testing.  working ok
+c on c65q but not yet tested on later checkpoints
+#ifdef ALLOW_GENCOST_SIGMAR
+            ELSEIF (gencost_barfile(kgen)(1:16).EQ.'m_boxmean_sigmaR')
+     &        THEN
+              tmpfld=sigmaRfield(i,j,k,bi,bj)
+              IF (tmpmsk.NE.0. _d 0) tmpmsk2=1. _d 0
+#endif /* ALLOW_GENCOST_SIGMAR */
+            ENDIF
+
 cts ---
 c Fill 3D field
 c       gencost_store - masked field of interest * grid cell volume
@@ -435,6 +668,19 @@ cts ---
 #endif
             IF (tmpmsk.NE.0. _d 0) tmpmsk2=1. _d 0
            ENDIF
+
+#ifdef ALLOW_SEAICE
+           IF (gencost_barfile(kgen)(1:14).EQ.'m_boxmean_area') THEN
+            tmpmsk=maskC(i,j,1,bi,bj)*gencost_mskCsurf(i,j,bi,bj,kgen)
+            tmpfld=area(i,j,bi,bj)
+            IF (tmpmsk.NE.0. _d 0) tmpmsk2=1. _d 0
+           ELSEIF (gencost_barfile(kgen)(1:14).EQ.'m_boxmean_heff') THEN
+            tmpmsk=maskC(i,j,1,bi,bj)*gencost_mskCsurf(i,j,bi,bj,kgen)
+            tmpfld=heff(i,j,bi,bj)
+            IF (tmpmsk.NE.0. _d 0) tmpmsk2=1. _d 0
+#endif /* ALLOW_SEAICE */
+           ENDIF
+
 #ifdef ALLOW_SHELFICE
 cts ---
 c Shelfice:
@@ -494,6 +740,16 @@ c---------
               tmpmskS=gencost_mskS(i,j,k,bi,bj,kgen3d)
 #endif /* ALLOW_GENCOST3D */
             ENDIF
+
+            IF (
+     &        (gencost_barfile(kgen)(1:15).EQ.'m_horflux_theta').OR.
+     &        (gencost_barfile(kgen)(1:14).EQ.'m_horflux_salt')
+     &           ) THEN
+c---------- Store local copy of section masks to add diffusive fluxes further down
+             tmp3dmskW(i,j,k)=tmpmskW
+             tmp3dmskS(i,j,k)=tmpmskS
+            ENDIF
+
             tmpmskW=tmpmskW*hFacW(i,j,k,bi,bj)*dyG(i,j,bi,bj)*drF(k)
             tmpmskS=tmpmskS*hFacS(i,j,k,bi,bj)*dxG(i,j,bi,bj)*drF(k)
 
@@ -516,30 +772,198 @@ c---------
      &                 vVel(i,j,k,bi,bj)*tmpmskS
      &                *maskInS(i,j,bi,bj)
 
-             trHeatW(i,j,k) = trVolW(i,j,k)
-     &                *(theta(i,j,k,bi,bj)+theta(i-1,j,k,bi,bj))*halfRL
-     &                *HeatCapacity_Cp*rhoConst
-             trHeatS(i,j,k) = trVolS(i,j,k)
-     &                *(theta(i,j,k,bi,bj)+theta(i,j-1,k,bi,bj))*halfRL
-     &                *HeatCapacity_Cp*rhoConst
+             temp=((theta(i,j,k,bi,bj)+theta(i-1,j,k,bi,bj))*halfRL
+     &              - T_ref)
+             IF (temp.GE. 0. _d 0) THEN
+               trHeatW(i,j,k) = trVolW(i,j,k)*temp
+     &           *HeatCapacity_Cp*rhoConst
+             ENDIF
+             temp=((theta(i,j,k,bi,bj)+theta(i,j-1,k,bi,bj))*halfRL
+     &              - T_ref)
+             IF (temp.GE. 0. _d 0) THEN
+               trHeatS(i,j,k) = trVolS(i,j,k)*temp
+     &           *HeatCapacity_Cp*rhoConst
+             ENDIF
 
-             trSaltW(i,j,k) = trVolW(i,j,k)
-     &                *(salt(i,j,k,bi,bj)+salt(i-1,j,k,bi,bj))*halfRL
-     &                *rhoConst/1000.
-             trSaltS(i,j,k) = trVolS(i,j,k)
-     &                *(salt(i,j,k,bi,bj)+salt(i,j-1,k,bi,bj))*halfRL
-     &                *rhoConst/1000.
+             temp=1. _d 0 - ((salt(i,j,k,bi,bj)+salt(i-1,j,k,bi,bj))
+     &              *halfRL)/S_ref
+             IF (temp.GE. 0. _d 0) THEN
+               trSaltW(i,j,k) = trVolW(i,j,k)*temp*rhoConst/1000.
+             ENDIF
+             temp=1. _d 0 - ((salt(i,j,k,bi,bj)+salt(i,j-1,k,bi,bj))
+     &              *halfRL)/S_ref
+             IF (temp.GE. 0. _d 0) THEN
+               trSaltS(i,j,k) = trVolS(i,j,k)*temp*rhoConst/1000.
+             ENDIF
 c now summing
              trVol(i,j,k,bi,bj)=trVolW(i,j,k)+trVolS(i,j,k)
              trHeat(i,j,k,bi,bj)=trHeatW(i,j,k)+trHeatS(i,j,k)
              trSalt(i,j,k,bi,bj)=trSaltW(i,j,k)+trSaltS(i,j,k)
 
             ENDIF
+
+            tmpfluxS=0. _d 0
+            tmpfluxW=0. _d 0
+            IF (gencost_barfile(kgen)(1:15).EQ.'m_horflux_theta') THEN
+              tmpfld=(theta(i,j,k,bi,bj)+theta(i-1,j,k,bi,bj))*halfRL
+              tmpfluxW = tmpfld*HeatCapacity_Cp*rhoConst
+              tmpfld=(theta(i,j,k,bi,bj)+theta(i,j-1,k,bi,bj))*halfRL
+              tmpfluxS = tmpfld*HeatCapacity_Cp*rhoConst
+              gencost_storefld(i,j,bi,bj,kgen) =
+     &          gencost_storefld(i,j,bi,bj,kgen)
+     &          +uVel(i,j,k,bi,bj)*tmpmskW*tmpfluxW
+     &          +vVel(i,j,k,bi,bj)*tmpmskS*tmpfluxS
+            ENDIF
+
+
+            IF (gencost_barfile(kgen)(1:14).EQ.'m_horflux_salt') THEN
+              tmpfld=(salt(i,j,k,bi,bj)+salt(i-1,j,k,bi,bj))*halfRL
+              tmpfluxW = tmpfld*rhoConst/1000.0
+              tmpfld=(salt(i,j,k,bi,bj)+salt(i,j-1,k,bi,bj))*halfRL
+              tmpfluxS = tmpfld*rhoConst/1000.0
+              gencost_storefld(i,j,bi,bj,kgen) =
+     &          gencost_storefld(i,j,bi,bj,kgen)
+     &          +uVel(i,j,k,bi,bj)*tmpmskW*tmpfluxW
+     &          +vVel(i,j,k,bi,bj)*tmpmskS*tmpfluxS
+
+            ENDIF
 C     end k-loop
            ENDDO
 c---------
+catn treat dthetadr on separate block because i have some hardcoded things
+#ifdef ALLOW_GENCOST_DTHETADR
+           IF (gencost_barfile(kgen)(1:18).EQ.'m_boxmean_dthetadr') THEN
+            IF(dthetadr.GT.0 _d 0 .AND. i.EQ.1.AND.j.EQ.1) THEN
+             gencost_storefld(i,j,bi,bj,kgen) =
+     &       gencost_storefld(i,j,bi,bj,kgen) + dthetadr
+            ELSE
+             gencost_storefld(i,j,bi,bj,kgen) = 0. _d 0
+            ENDIF
+            IF(dthetadr.GT.0 _d 0) THEN
+             areavolTile(bi,bj)= 1. _d 0
+            ELSE
+             areavolTile(bi,bj)= 0. _d 0
+            ENDIF
+           ENDIF
+#endif /* ALLOW_GENCOST_DTHETADR */
+c---------
+          ENDDO !i
+         ENDDO  !j
+
+catn init to avoid recomp
+         DO k=1,Nr
+          DO j=1-OLy,sNy+OLy
+           DO i=1-OLx,sNx+OLx
+            localT(i,j,k)=0. _d 0
+            tmp3dmsks(i,j,k)=0. _d 0
+            tmp3dmskw(i,j,k)=0. _d 0
+           ENDDO
           ENDDO
          ENDDO
+
+c------ Add diffusive and GM/Redi fluxes to horflux_[theta/salt]
+         IF (
+     &     (gencost_barfile(kgen)(1:15).EQ.'m_horflux_theta').OR.
+     &     (gencost_barfile(kgen)(1:14).EQ.'m_horflux_salt')
+     &      ) THEN
+c--------- Make a local copy of tracer array (for this tile)
+c this code is identical to Nora's except that I also compute the
+c diffusive and bolus transport wrt a reference temperature/salinity
+          IF (gencost_barfile(kgen)(1:15).EQ.'m_horflux_theta') THEN
+           DO k=1,Nr
+            DO j=1-OLy,sNy+OLy
+             DO i=1-OLx,sNx+OLx
+              localT(i,j,k)=theta(i,j,k,bi,bj)-T_ref
+             ENDDO
+            ENDDO
+           ENDDO
+          ELSEIF (gencost_barfile(kgen)(1:14).EQ.'m_horflux_salt') THEN
+           DO k=1,nr
+            DO j=1-OLy,sNy+OLy
+             DO i=1-OLx,sNx+OLx
+              localT(i,j,k)=1. _d 0 -(salt(i,j,k,bi,bj)/S_ref)
+              IF (localT(i,j,k).LE. 0. _d 0) THEN
+               localT(i,j,k)=0.0
+              ENDIF
+             ENDDO
+            ENDDO
+           ENDDO
+          ENDIF
+c--------
+          DO k=1,Nr
+           DO j=1-OLy,sNy+OLy
+            DO i=1-OLx,sNx+OLx
+             tmp2dmskW(i,j)=hFacW(i,j,k,bi,bj)*dyG(i,j,bi,bj)*drF(k)
+             tmp2dmskS(i,j)=hFacS(i,j,k,bi,bj)*dxG(i,j,bi,bj)*drF(k)
+catn initialize df[x,y] to avoid recomp
+             dfx(i,j) = 0. _d 0
+             dfy(i,j) = 0. _d 0
+            ENDDO
+           ENDDO
+c --------- Diffusive flux in X; assume deepFac=1; ignore biharmonic
+           IF (diffKh.ne.0) THEN
+            CALL gad_diff_x(
+     I       bi,bj,k,tmp2dmskW,diffKh,localT,
+     O       dfx,
+     I       myThid)
+            CALL gad_diff_y(
+     I       bi,bj,k,tmp2dmskS,diffKh,localT,
+     O       dfy,
+     I       myThid)
+           ELSE
+            DO j=1-OLy,sNy+OLy
+             DO i=1-OLx,sNx+OLx
+              dfx(i,j) = 0. _d 0
+              dfy(i,j) = 0. _d 0
+             ENDDO
+            ENDDO
+           ENDIF
+c -----------Add GM/Redi flux in [X,Y] to df[x,y]
+c commenting this because still causes problems in adjoint
+c#ifdef ALLOW_GMREDI
+c           IF ( useGMredi ) THEN
+c            CALL gmredi_xtransport(
+c     I        trIdentity, bi, bj, k, 1-OLx+1, sNx+OLx, 1-OLy, sNy+OLy,
+c     I        tmp2dmskW,localT,
+c     U        dfx,
+c     I        myThid )
+c            CALL gmredi_ytransport(
+c     I        trIdentity, bi, bj, k, 1-OLx+1, sNx+OLx, 1-OLy, sNy+OLy,
+c     I        tmp2dmskS,localT,
+c     U        dfy,
+c     I        myThid )
+c           ENDIF
+c#endif
+c-------- Add fluxes in [X,Y] to gencost; assume rhoFacC = 1
+           IF (gencost_barfile(kgen)(1:15).EQ.'m_horflux_theta')
+     &     THEN
+            DO j=1,sNy
+             DO i=1,sNx
+              gencost_storefld(i,j,bi,bj,kgen) =
+     &         gencost_storefld(i,j,bi,bj,kgen) +
+     &         (dfx(i,j)*tmp3dmskW(i,j,k)+dfy(i,j)*tmp3dmskS(i,j,k))
+     &         *HeatCapacity_Cp*rhoConst
+             ENDDO
+            ENDDO
+c
+           ELSEIF (gencost_barfile(kgen)(1:14).EQ.'m_horflux_salt')
+     &     THEN
+            DO j=1,sNy
+             DO i=1,sNx
+              gencost_storefld(i,j,bi,bj,kgen) =
+     &         gencost_storefld(i,j,bi,bj,kgen) +
+     &         (dfx(i,j)*tmp3dmskW(i,j,k)+dfy(i,j)*tmp3dmskS(i,j,k))
+     &         *rhoConst/1000.
+             ENDDO
+            ENDDO
+           ENDIF
+c
+          ENDDO !k           !}}}
+c gencost_barfile = m_horflux_[theta,salt]
+         ENDIF
+c
+c----------------- end of Nora's changes for FULL horflux costs
+c
         ENDDO
        ENDDO
 

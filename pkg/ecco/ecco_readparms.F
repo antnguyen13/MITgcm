@@ -685,11 +685,13 @@ catn move boxmean outside -1 to have its own check
 catn preserve -2 for potential separate group above into cost
 catn with and without requirements of datafile or errfile
          elseif ( (gencost_barfile(k)(1:9).EQ.'m_boxmean').OR.
+     &            (gencost_barfile(k)(1:9).EQ.'m_boxcont').OR.
      &            (gencost_barfile(k)(1:9).EQ.'m_horflux') ) then
            gencost_flag(k)=-3
            using_gencost(k)=.TRUE.
            il=ilnblnk(gencost_name(k))
-           WRITE(msgBuf,'(A,I3,3A,L5)') 'gencost k_boxmean/horflux=',
+           WRITE(msgBuf,'(A,I3,3A,L5)')
+     &         'gencost k_boxmean/boxcont/horflux=',
      &     k,' ',gencost_name(k)(1:il),': ',using_gencost(k)
            CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
      &                         SQUEEZE_RIGHT, myThid )
@@ -699,8 +701,10 @@ catn with and without requirements of datafile or errfile
              gencost_msk_k3d=gencost_msk_k3d+1
            endif
 
+#ifdef ALLOW_GENCOST_TRANSPORT
 catn add cost global transport using gencost framework
-         elseif ( gencost_name(k)(1:6).EQ.'transp' ) then
+catn         elseif ( gencost_name(k)(1:6).EQ.'transp' ) then
+         elseif ( gencost_barfile(k)(1:4).EQ.'m_tr' ) then
            gencost_flag(k)=-4
            using_gencost(k)=.TRUE.
            il=ilnblnk(gencost_name(k))
@@ -708,7 +712,7 @@ catn add cost global transport using gencost framework
      &     k,' ',gencost_name(k)(1:il),': ',using_gencost(k)
            CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
      &                         SQUEEZE_RIGHT, myThid )
-
+#endif /* ALLOW_GENCOST_TRANSPORT */
 cts moc cost function using gencost framework
          elseif ( gencost_name(k)(1:3).EQ.'moc' ) then
            gencost_flag(k)=-5
@@ -737,10 +741,12 @@ c identified three dimensional variables
      &        (gencost_barfile(k)(1:6).EQ.'m_salt').OR.
      &        (gencost_barfile(k)(1:8).EQ.'m_diffkr').OR.
      &        (gencost_barfile(k)(1:7).EQ.'m_kapgm').OR.
-     &        (gencost_barfile(k)(1:9).EQ.'m_kapredi').OR.
-     &        (gencost_barfile(k)(1:7).EQ.'m_trVol').OR.
+     &        (gencost_barfile(k)(1:9).EQ.'m_kapredi')
+#ifdef ALLOW_GENCOST_TRANSPORT
+     &    .OR.(gencost_barfile(k)(1:7).EQ.'m_trVol').OR.
      &        (gencost_barfile(k)(1:8).EQ.'m_trHeat').OR.
      &        (gencost_barfile(k)(1:8).EQ.'m_trSalt')
+#endif /* ALLOW_GENCOST_TRANSPORT */
      &       )
      &        gencost_is3d(k)=.TRUE.
 
