@@ -102,6 +102,8 @@ C--  Time-stepping related param.
      &                    SQUEEZE_RIGHT, myThid )
 
 C--  Seaice-Dynamics parameters
+      CALL WRITE_0D_L ( SEAICEmultiDimAdvection, INDEX_NONE,
+     & 'SEAICEmultiDimAdvection =', ' /* multidimadvec */')
       CALL WRITE_0D_L ( SEAICEuseDYNAMICS, INDEX_NONE,
      & 'SEAICEuseDYNAMICS =', ' /* use dynamics */')
 
@@ -473,6 +475,9 @@ C- note: air and seaice (+ snow ?) density are used in both dynamics & thermo
       CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
      &     SQUEEZE_RIGHT, myThid )
       WRITE(msgBuf,'(A)') ' '
+      CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
+     &     SQUEEZE_RIGHT, myThid )
+      WRITE(msgBuf,'(A,A,E24.17)') 'SINegFac ',' = ', SINegFac
       CALL PRINT_MESSAGE( msgBuf, standardMessageUnit,
      &     SQUEEZE_RIGHT, myThid )
 #endif /* SEAICE_USE_GROWTH_ADX */
